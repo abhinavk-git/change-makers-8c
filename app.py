@@ -120,73 +120,85 @@ if not st.session_state.logged_in:
                         
     st.stop()
 
-# --- LOGOUT BUTTON ---
+# --- SIDEBAR NAVIGATION ---
 with st.sidebar:
+    st.title("🏛️ Museum Menu")
+    page = st.radio("Navigation", ["Dashboard", "My Profile"])
+    
+    st.divider()
+    
     st.markdown(f"**Logged in as:** {st.session_state.username}")
     if st.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = ""
         st.rerun()
-    st.divider()
 
-# --- MAIN APP BELOW ---
-st.title("🏛️ Change Makers Model Museum")
-st.markdown("Welcome to the Model Museum! Explore our models or add your own.")
+# --- PAGE: MY PROFILE ---
+if page == "My Profile":
+    st.title("👤 My Profile")
+    st.markdown(f"**Username:** {st.session_state.username}")
+    st.info("In the future, you will be able to see all the models you've added right here!")
+    
+# --- PAGE: DASHBOARD ---
+elif page == "Dashboard":
+    st.title("🏛️ Change Makers Model Museum")
+    st.markdown("Welcome to the Model Museum! Explore our models or add your own.")
 
-# --- SIDEBAR: ADD NEW MODEL ---
-with st.sidebar:
-    st.header("Add New Model")
-    with st.form("add_model_form", clear_on_submit=True):
-        title = st.text_input("Model Name", max_chars=100)
-        desc = st.text_area("Description")
-        img = st.file_uploader("Upload Image (Drag & Drop here)", type=["jpg", "jpeg", "png", "webp"])
-        
-        submitted = st.form_submit_button("Add Model")
-        if submitted:
-            if title and img:
-                with st.spinner("Optimizing and uploading..."):
-                    db.add_model(title, desc, img)
-                st.success("Model added successfully!")
-                st.rerun()
-            else:
-                st.error("Please provide a name and an image.")
+    # --- ADD NEW MODEL (Inside an Expander) ---
+    with st.expander("➕ Add New Model", expanded=False):
+        with st.form("add_model_form", clear_on_submit=True):
+            title = st.text_input("Model Name", max_chars=100)
+            desc = st.text_area("Description")
+            img = st.file_uploader("Upload Image (Optional)", type=["jpg", "jpeg", "png", "webp"])
+            
+            submitted = st.form_submit_button("Add Model")
+            if submitted:
+                # Made image NOT mandatory
+                if title:
+                    with st.spinner("Uploading..."):
+                        db.add_model(title, desc, img)
+                    st.success("Model added successfully!")
+                    st.rerun()
+                else:
+                    st.error("Please provide at least a name for the model.")
 
-# --- MAIN CONTENT: GALLERY ---
-models = db.load_models()
+    # --- MAIN CONTENT: GALLERY ---
+    models = db.load_models()
 
-if not models:
-    st.info("The museum is currently empty. Be the first to add a model using the sidebar!")
-else:
-    cols_per_row = 3
-    for i in range(0, len(models), cols_per_row):
-        cols = st.columns(cols_per_row)
-        for j, col in enumerate(cols):
-            if i + j < len(models):
-                m = models[i + j]
-                with col:
-                    st.subheader(m.get("title", "Untitled"))
-                    
-                    if m.get("image_url"):
-                        st.image(m["image_url"], use_container_width=True)
-                    
-                    if m.get("description"):
-                        st.write(m["description"])
+    if not models:
+        st.info("The museum is currently empty. Be the first to add a model!")
+    else:
+        cols_per_row = 3
+        for i in range(0, len(models), cols_per_row):
+            cols = st.columns(cols_per_row)
+            for j, col in enumerate(cols):
+                if i + j < len(models):
+                    m = models[i + j]
+                    with col:
+                        st.subheader(m.get("title", "Untitled"))
                         
-                    # Edit / Delete Section
-                    with st.expander("Edit / Delete"):
-                        with st.form(f"edit_form_{m['id']}"):
-                            edit_title = st.text_input("Name", value=m.get("title", ""))
-                            edit_desc = st.text_area("Description", value=m.get("description", ""))
-                            edit_img = st.file_uploader("New Image (optional)", type=["jpg", "jpeg", "png", "webp"])
+                        if m.get("image_url"):
+                            st.image(m["image_url"], use_container_width=True)
+                        
+                        if m.get("description"):
+                            st.write(m["description"])
                             
-                            col1, col2 = st.columns(2)
-                            with col1:
-                                if st.form_submit_button("Update"):
-                                    with st.spinner("Updating..."):
-                                        db.update_model(m["id"], edit_title, edit_desc, edit_img)
-                                    st.success("Updated!")
-                                    st.rerun()
-                            with col2:
-                                if st.form_submit_button("Delete ❌"):
-                                    db.delete_model(m["id"])
-                                    st.rerun()
+                        # Edit / Delete Section
+                        with st.expander("Edit / Delete"):
+                            with st.form(f"edit_form_{m['id']}"):
+                                edit_title = st.text_input("Name", value=m.get("title", ""))
+                                edit_desc = st.text_area("Description", value=m.get("description", ""))
+                                edit_img = st.file_uploader("New Image (optional)", type=["jpg", "jpeg", "png", "webp"])
+                                
+                                col1, col2 = st.columns(2)
+                                with col1:
+                                    if st.form_submit_button("Update"):
+                                        with st.spinner("Updating..."):
+                                            db.update_model(m["id"], edit_title, edit_desc, edit_img)
+                                        st.success("Updated!")
+                                        st.rerun()
+                                with col2:
+                                    if st.form_submit_button("Delete ❌"):
+                                        db.delete_model(m["id"])
+                                        st.rerun()
+
