@@ -8,8 +8,16 @@ auth = None
 USE_FIREBASE_AUTH = False
 firebase_setup_error = None
 
+# Safely check if secrets exist at all
+secrets_exist = False
 try:
-    if "firebase_api_key" in st.secrets and "firebase_project_id" in st.secrets:
+    _ = st.secrets
+    secrets_exist = True
+except Exception:
+    pass
+
+try:
+    if secrets_exist and "firebase_api_key" in st.secrets and "firebase_project_id" in st.secrets:
         import pyrebase
         config = {
             "apiKey": st.secrets["firebase_api_key"],
@@ -46,7 +54,6 @@ if not st.session_state.logged_in:
                 username = st.text_input("Username")
                 password = st.text_input("Password", type="password")
                 if st.form_submit_button("Login"):
-                    # Hack: Firebase requires an email, so we fake one using the username!
                     fake_email = f"{username.lower().replace(' ', '')}@changemakers.local"
                     try:
                         user = auth.sign_in_with_email_and_password(fake_email, password)
@@ -70,21 +77,24 @@ if not st.session_state.logged_in:
     else:
         if firebase_setup_error:
             st.error(f"⚠️ Firebase Error: {firebase_setup_error}")
-        
+            
+        if not secrets_exist:
+            st.error("⚠️ No secrets file found. If you are running locally, create `.streamlit/secrets.toml`")
+        elif "firebase_api_key" not in st.secrets or "firebase_project_id" not in st.secrets:
+            st.error("⚠️ Missing `firebase_api_key` or `firebase_project_id` in secrets.")
+            
         st.warning("Firebase Authentication is not configured yet. Falling back to simple admin password.")
-        
-        # DEBUG HELPER
-        if "firebase_api_key" not in st.secrets:
-            st.error("Missing `firebase_api_key` in secrets.")
-        if "firebase_project_id" not in st.secrets:
-            st.error("Missing `firebase_project_id` in secrets.")
         
         with st.form("simple_login_form"):
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
             if st.form_submit_button("Login"):
-                correct_username = st.secrets.get("admin_username", "admin")
-                correct_password = st.secrets.get("admin_password", "changemakers")
+                correct_username = "admin"
+                correct_password = "changemakers"
+                if secrets_exist:
+                    correct_username = st.secrets.get("admin_username", correct_username)
+                    correct_password = st.secrets.get("admin_password", correct_password)
+                
                 if username == correct_username and password == correct_password:
                     st.session_state.logged_in = True
                     st.session_state.username = username
@@ -92,7 +102,7 @@ if not st.session_state.logged_in:
                 else:
                     st.error("Incorrect username or password.")
                     
-    st.stop() # Stop rendering the rest of the app until logged in
+    st.stop()
 
 # --- LOGOUT BUTTON ---
 with st.sidebar:
