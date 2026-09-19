@@ -3,35 +3,89 @@ import database as db
 
 st.set_page_config(page_title="Change Makers 8c", page_icon="🏛️", layout="wide")
 
+# --- FIREBASE AUTHENTICATION SETUP ---
+auth = None
+USE_FIREBASE_AUTH = False
+
+try:
+    if "firebase_api_key" in st.secrets and "firebase_project_id" in st.secrets:
+        import pyrebase
+        config = {
+            "apiKey": st.secrets["firebase_api_key"],
+            "authDomain": f"{st.secrets['firebase_project_id']}.firebaseapp.com",
+            "projectId": st.secrets["firebase_project_id"],
+            "databaseURL": "",
+            "storageBucket": f"{st.secrets['firebase_project_id']}.appspot.com",
+            "messagingSenderId": "",
+            "appId": "",
+            "measurementId": ""
+        }
+        firebase_app = pyrebase.initialize_app(config)
+        auth = firebase_app.auth()
+        USE_FIREBASE_AUTH = True
+except Exception as e:
+    print("Firebase Auth setup failed:", e)
+
+
 # --- LOGIN SYSTEM ---
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
+if "user_email" not in st.session_state:
+    st.session_state.user_email = ""
 
 if not st.session_state.logged_in:
     st.title("🔒 Login Required")
-    st.markdown("Please log in to access the Model Museum.")
+    st.markdown("Please log in or create an account to access the Model Museum.")
     
-    with st.form("login_form"):
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        submitted = st.form_submit_button("Login")
+    if USE_FIREBASE_AUTH:
+        tab1, tab2 = st.tabs(["Login", "Create Account"])
         
-        if submitted:
-            # Check secrets first, fallback to default hardcoded credentials
-            correct_username = st.secrets.get("admin_username", "admin")
-            correct_password = st.secrets.get("admin_password", "changemakers")
-            
-            if username == correct_username and password == correct_password:
-                st.session_state.logged_in = True
-                st.rerun()
-            else:
-                st.error("Incorrect username or password.")
+        with tab1:
+            with st.form("login_form"):
+                email = st.text_input("Email")
+                password = st.text_input("Password", type="password")
+                if st.form_submit_button("Login"):
+                    try:
+                        user = auth.sign_in_with_email_and_password(email, password)
+                        st.session_state.logged_in = True
+                        st.session_state.user_email = email
+                        st.rerun()
+                    except Exception as e:
+                        st.error("Invalid email or password.")
+                        
+        with tab2:
+            with st.form("signup_form"):
+                new_email = st.text_input("Email")
+                new_password = st.text_input("Password (min 6 characters)", type="password")
+                if st.form_submit_button("Create Account"):
+                    try:
+                        user = auth.create_user_with_email_and_password(new_email, new_password)
+                        st.success("Account created successfully! Please log in on the other tab.")
+                    except Exception as e:
+                        st.error(f"Error creating account: {e}")
+    else:
+        st.warning("Firebase Authentication is not configured yet. Falling back to simple admin password.")
+        with st.form("simple_login_form"):
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
+            if st.form_submit_button("Login"):
+                correct_username = st.secrets.get("admin_username", "admin")
+                correct_password = st.secrets.get("admin_password", "changemakers")
+                if username == correct_username and password == correct_password:
+                    st.session_state.logged_in = True
+                    st.session_state.user_email = "Admin"
+                    st.rerun()
+                else:
+                    st.error("Incorrect username or password.")
+                    
     st.stop() # Stop rendering the rest of the app until logged in
 
 # --- LOGOUT BUTTON ---
 with st.sidebar:
+    st.markdown(f"**Logged in as:** {st.session_state.user_email}")
     if st.button("Logout"):
         st.session_state.logged_in = False
+        st.session_state.user_email = ""
         st.rerun()
     st.divider()
 
@@ -63,7 +117,6 @@ models = db.load_models()
 if not models:
     st.info("The museum is currently empty. Be the first to add a model using the sidebar!")
 else:
-    # Display in a grid
     cols_per_row = 3
     for i in range(0, len(models), cols_per_row):
         cols = st.columns(cols_per_row)
