@@ -6,6 +6,7 @@ st.set_page_config(page_title="Change Makers 8c", page_icon="🏛️", layout="w
 # --- FIREBASE AUTHENTICATION SETUP ---
 auth = None
 USE_FIREBASE_AUTH = False
+firebase_setup_error = None
 
 try:
     if "firebase_api_key" in st.secrets and "firebase_project_id" in st.secrets:
@@ -24,7 +25,7 @@ try:
         auth = firebase_app.auth()
         USE_FIREBASE_AUTH = True
 except Exception as e:
-    print("Firebase Auth setup failed:", e)
+    firebase_setup_error = str(e)
 
 
 # --- LOGIN SYSTEM ---
@@ -67,7 +68,17 @@ if not st.session_state.logged_in:
                     except Exception as e:
                         st.error("Username might already be taken, or password is too short.")
     else:
+        if firebase_setup_error:
+            st.error(f"⚠️ Firebase Error: {firebase_setup_error}")
+        
         st.warning("Firebase Authentication is not configured yet. Falling back to simple admin password.")
+        
+        # DEBUG HELPER
+        if "firebase_api_key" not in st.secrets:
+            st.error("Missing `firebase_api_key` in secrets.")
+        if "firebase_project_id" not in st.secrets:
+            st.error("Missing `firebase_project_id` in secrets.")
+        
         with st.form("simple_login_form"):
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
