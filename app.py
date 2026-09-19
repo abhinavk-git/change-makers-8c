@@ -30,8 +30,8 @@ except Exception as e:
 # --- LOGIN SYSTEM ---
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
-if "user_email" not in st.session_state:
-    st.session_state.user_email = ""
+if "username" not in st.session_state:
+    st.session_state.username = ""
 
 if not st.session_state.logged_in:
     st.title("🔒 Login Required")
@@ -42,27 +42,30 @@ if not st.session_state.logged_in:
         
         with tab1:
             with st.form("login_form"):
-                email = st.text_input("Email")
+                username = st.text_input("Username")
                 password = st.text_input("Password", type="password")
                 if st.form_submit_button("Login"):
+                    # Hack: Firebase requires an email, so we fake one using the username!
+                    fake_email = f"{username.lower().replace(' ', '')}@changemakers.local"
                     try:
-                        user = auth.sign_in_with_email_and_password(email, password)
+                        user = auth.sign_in_with_email_and_password(fake_email, password)
                         st.session_state.logged_in = True
-                        st.session_state.user_email = email
+                        st.session_state.username = username
                         st.rerun()
                     except Exception as e:
-                        st.error("Invalid email or password.")
+                        st.error("Invalid username or password.")
                         
         with tab2:
             with st.form("signup_form"):
-                new_email = st.text_input("Email")
-                new_password = st.text_input("Password (min 6 characters)", type="password")
+                new_username = st.text_input("Choose a Username")
+                new_password = st.text_input("Choose a Password (min 6 characters)", type="password")
                 if st.form_submit_button("Create Account"):
+                    fake_email = f"{new_username.lower().replace(' ', '')}@changemakers.local"
                     try:
-                        user = auth.create_user_with_email_and_password(new_email, new_password)
-                        st.success("Account created successfully! Please log in on the other tab.")
+                        user = auth.create_user_with_email_and_password(fake_email, new_password)
+                        st.success(f"Account '{new_username}' created successfully! Please log in on the other tab.")
                     except Exception as e:
-                        st.error(f"Error creating account: {e}")
+                        st.error("Username might already be taken, or password is too short.")
     else:
         st.warning("Firebase Authentication is not configured yet. Falling back to simple admin password.")
         with st.form("simple_login_form"):
@@ -73,7 +76,7 @@ if not st.session_state.logged_in:
                 correct_password = st.secrets.get("admin_password", "changemakers")
                 if username == correct_username and password == correct_password:
                     st.session_state.logged_in = True
-                    st.session_state.user_email = "Admin"
+                    st.session_state.username = username
                     st.rerun()
                 else:
                     st.error("Incorrect username or password.")
@@ -82,10 +85,10 @@ if not st.session_state.logged_in:
 
 # --- LOGOUT BUTTON ---
 with st.sidebar:
-    st.markdown(f"**Logged in as:** {st.session_state.user_email}")
+    st.markdown(f"**Logged in as:** {st.session_state.username}")
     if st.button("Logout"):
         st.session_state.logged_in = False
-        st.session_state.user_email = ""
+        st.session_state.username = ""
         st.rerun()
     st.divider()
 
