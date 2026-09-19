@@ -2,3 +2,4 @@ streamlit
 Pillow
 firebase-admin
 pyrebase4
+extra-streamlit-components

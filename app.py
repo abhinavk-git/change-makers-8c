@@ -1,5 +1,7 @@
 import streamlit as st
 import database as db
+import extra_streamlit_components as stx
+import datetime
 
 st.set_page_config(page_title="Change Makers 8c", page_icon="🏛️", layout="wide")
 
@@ -54,6 +56,19 @@ if "logged_in" not in st.session_state:
 if "username" not in st.session_state:
     st.session_state.username = ""
 
+# --- COOKIE MANAGER (24 HR PERSISTENT LOGIN) ---
+@st.cache_resource(experimental_allow_widgets=True)
+def get_cookie_manager():
+    return stx.CookieManager()
+
+cookie_manager = get_cookie_manager()
+
+stored_username = cookie_manager.get(cookie="cm_username")
+if stored_username and not st.session_state.logged_in:
+    st.session_state.logged_in = True
+    st.session_state.username = stored_username
+    st.rerun()
+
 if not st.session_state.logged_in:
     # Use columns to center the login form and prevent it from stretching
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -75,6 +90,8 @@ if not st.session_state.logged_in:
                             user = auth.sign_in_with_email_and_password(fake_email, password)
                             st.session_state.logged_in = True
                             st.session_state.username = username
+                            # Set cookie for 24 hours
+                            cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
                             st.rerun()
                         except Exception as e:
                             st.error("Invalid username or password.")
@@ -114,6 +131,7 @@ if not st.session_state.logged_in:
                     if username == correct_username and password == correct_password:
                         st.session_state.logged_in = True
                         st.session_state.username = username
+                        cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
                         st.rerun()
                     else:
                         st.error("Incorrect username or password.")
@@ -131,6 +149,7 @@ with st.sidebar:
     if st.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = ""
+        cookie_manager.delete("cm_username")
         st.rerun()
 
 # --- PAGE: MY PROFILE ---
@@ -201,4 +220,3 @@ elif page == "Dashboard":
                                     if st.form_submit_button("Delete ❌"):
                                         db.delete_model(m["id"])
                                         st.rerun()
-
