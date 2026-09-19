@@ -3,6 +3,39 @@ import database as db
 
 st.set_page_config(page_title="Change Makers 8c", page_icon="🏛️", layout="wide")
 
+# --- LOGIN SYSTEM ---
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if not st.session_state.logged_in:
+    st.title("🔒 Login Required")
+    st.markdown("Please log in to access the Model Museum.")
+    
+    with st.form("login_form"):
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        submitted = st.form_submit_button("Login")
+        
+        if submitted:
+            # Check secrets first, fallback to default hardcoded credentials
+            correct_username = st.secrets.get("admin_username", "admin")
+            correct_password = st.secrets.get("admin_password", "changemakers")
+            
+            if username == correct_username and password == correct_password:
+                st.session_state.logged_in = True
+                st.rerun()
+            else:
+                st.error("Incorrect username or password.")
+    st.stop() # Stop rendering the rest of the app until logged in
+
+# --- LOGOUT BUTTON ---
+with st.sidebar:
+    if st.button("Logout"):
+        st.session_state.logged_in = False
+        st.rerun()
+    st.divider()
+
+# --- MAIN APP BELOW ---
 st.title("🏛️ Change Makers Model Museum")
 st.markdown("Welcome to the Model Museum! Explore our models or add your own.")
 
