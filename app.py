@@ -3,6 +3,18 @@ import database as db
 
 st.set_page_config(page_title="Change Makers 8c", page_icon="🏛️", layout="wide")
 
+# --- HIDE STREAMLIT BRANDING & MENU ---
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            header {visibility: hidden;}
+            footer {visibility: hidden;}
+            .stDeployButton {display:none;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
+
 # --- FIREBASE AUTHENTICATION SETUP ---
 auth = None
 USE_FIREBASE_AUTH = False
