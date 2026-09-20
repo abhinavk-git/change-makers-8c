@@ -44,15 +44,7 @@ hide_st_style = """
             div.stButton > button {
                 border-radius: 0px !important;
             }
-            /* Pin the notification bell to the absolute top right */
-            div[data-testid="stPopover"] {
-                display: flex;
-                justify-content: flex-end;
-                z-index: 999999 !important;
-                transform: scale(1.3);
-                transform-origin: right center;
-            }
-            </style>
+                        </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
@@ -299,42 +291,79 @@ with st.sidebar:
 page = st.session_state.page
 
 # --- GLOBAL NOTIFICATION BELL ---
-tcol1, tcol2 = st.columns([10, 1])
-with tcol2:
-    unread_count = db.get_unread_count(st.session_state.username)
-    bell_icon = f"🔔 ({unread_count})" if unread_count > 0 else "🔔"
-    with st.popover(bell_icon):
-            st.subheader("Direct Messages")
+# Lichess style floating chat box using JS injection for cross-browser reliability
+unread_count = db.get_unread_count(st.session_state.username)
+bell_icon = f"💬 Chat ({unread_count})" if unread_count > 0 else "💬 Chat"
+
+st.markdown('<div id="chat-anchor"></div>', unsafe_allow_html=True)
+with st.popover(bell_icon):
+        st.subheader("Direct Messages")
+        
+        # Message sending
+        all_users = db.get_all_users()
+        other_users = [u for u in all_users.keys() if u != st.session_state.username]
+        with st.form("send_msg_form", clear_on_submit=True):
+            recipient = st.selectbox("To:", other_users)
+            msg_text = st.text_area("Message:")
+            if st.form_submit_button("Send"):
+                if recipient and msg_text.strip():
+                    db.send_message(st.session_state.username, recipient, msg_text.strip())
+                    st.success("Sent!")
+        
+        st.markdown("---")
+        if unread_count > 0:
+            if st.button("Mark all as read", type="primary", use_container_width=True):
+                db.mark_messages_read(st.session_state.username)
+                st.rerun()
+                
+        # Message list
+        msgs = db.get_messages_for_user(st.session_state.username)
+        if not msgs:
+            st.info("No messages.")
+        else:
+            for m in reversed(msgs[-20:]): # Only show last 20 messages
+                with st.container(border=True):
+                    is_unread = not m["read"] and m["recipient"] == st.session_state.username
+                    dot = "🔵 " if is_unread else ""
+                    st.markdown(f"{dot}**From:** {m['sender']} | **To:** {m['recipient']}")
+                    st.caption(m['timestamp'])
+                    st.write(m['text'])
+
+# Inject JS to aggressively position the chat popover like Lichess (bottom right)
+import streamlit.components.v1 as components
+components.html('''
+<script>
+    // Find the anchor and then find the adjacent popover
+    const anchor = parent.document.getElementById('chat-anchor');
+    if (anchor) {
+        // The anchor is inside a markdown div -> element-container
+        const anchorContainer = anchor.closest('.element-container');
+        // The popover is the next element-container
+        const popoverContainer = anchorContainer.nextElementSibling;
+        
+        if (popoverContainer) {
+            popoverContainer.style.position = 'fixed';
+            popoverContainer.style.bottom = '0px';
+            popoverContainer.style.right = '30px';
+            popoverContainer.style.zIndex = '999999';
+            popoverContainer.style.width = 'auto';
             
-            # Message sending
-            all_users = db.get_all_users()
-            other_users = [u for u in all_users.keys() if u != st.session_state.username]
-            with st.form("send_msg_form", clear_on_submit=True):
-                recipient = st.selectbox("To:", other_users)
-                msg_text = st.text_area("Message:")
-                if st.form_submit_button("Send"):
-                    if recipient and msg_text.strip():
-                        db.send_message(st.session_state.username, recipient, msg_text.strip())
-                        st.success("Sent!")
-            
-            st.markdown("---")
-            if unread_count > 0:
-                if st.button("Mark all as read", type="primary", use_container_width=True):
-                    db.mark_messages_read(st.session_state.username)
-                    st.rerun()
-                    
-            # Message list
-            msgs = db.get_messages_for_user(st.session_state.username)
-            if not msgs:
-                st.info("No messages.")
-            else:
-                for m in reversed(msgs[-20:]): # Only show last 20 messages
-                    with st.container(border=True):
-                        is_unread = not m["read"] and m["recipient"] == st.session_state.username
-                        dot = "🔵 " if is_unread else ""
-                        st.markdown(f"{dot}**From:** {m['sender']} | **To:** {m['recipient']}")
-                        st.caption(m['timestamp'])
-                        st.write(m['text'])
+            // Make the button itself look like a Lichess chat tab
+            const btn = popoverContainer.querySelector('button');
+            if (btn) {
+                btn.style.backgroundColor = '#262421';
+                btn.style.color = '#c9c8c5';
+                btn.style.border = '1px solid #403e3c';
+                btn.style.borderBottom = 'none';
+                btn.style.borderRadius = '5px 5px 0 0 !important';
+                btn.style.padding = '10px 20px';
+                btn.style.fontWeight = 'bold';
+                btn.style.boxShadow = '0px -2px 10px rgba(0,0,0,0.5)';
+            }
+        }
+    }
+</script>
+''', height=0)
     
     
 # --- PAGE: ABOUT US ---
