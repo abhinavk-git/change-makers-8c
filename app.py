@@ -156,25 +156,25 @@ if not st.session_state.logged_in:
     st.stop()
 
 # --- SIDEBAR NAVIGATION ---
+if "page" not in st.session_state:
+    st.session_state.page = "Dashboard"
+
 with st.sidebar:
     st.title("🏛️ Museum Menu")
     
-    page = option_menu(
-        menu_title=None, 
-        options=["Dashboard", "Add a Model", "My Profile", "Logout"], 
-        icons=["house", "plus-square", "person-circle", "box-arrow-right"], 
-        menu_icon="cast", 
-        default_index=0,
-        styles={
-            "container": {"padding": "0!important", "background-color": "transparent"},
-            "icon": {"color": "orange", "font-size": "18px"}, 
-            "nav-link": {"font-size": "16px", "text-align": "left", "margin":"0px"},
-            "nav-link-selected": {"background-color": "#ff4b4b"},
-        }
-    )
+    if st.button("🏠 Dashboard", use_container_width=True):
+        st.session_state.page = "Dashboard"
+    if st.button("➕ Add a Model", use_container_width=True):
+        st.session_state.page = "Add a Model"
+    if st.button("👤 My Profile", use_container_width=True):
+        st.session_state.page = "My Profile"
+    if st.button("🚪 Logout", use_container_width=True):
+        st.session_state.page = "Logout"
     
     st.divider()
     st.markdown(f"**Logged in as:** {st.session_state.username}")
+
+page = st.session_state.page
 
 # --- ACTION: LOGOUT ---
 if page == "Logout":
