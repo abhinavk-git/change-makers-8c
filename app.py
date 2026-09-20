@@ -117,22 +117,17 @@ hide_st_style = """
             }
 
             
-            /* Text Bubbles: Apply glass specifically to text elements so they hug the text */
-            .main div.stMarkdown p, 
-            .main div.stMarkdown h1, 
-            .main div.stMarkdown h2, 
-            .main div.stMarkdown h3, 
-            .main div.stMarkdown li {
-                background-color: rgba(38, 36, 33, 0.75) !important;
-                backdrop-filter: blur(12px) !important;
-                padding: 5px 12px !important;
-                border-radius: 6px !important;
-                box-shadow: 0px 4px 10px rgba(0,0,0,0.3) !important;
-                width: fit-content !important;
-                margin-bottom: 5px;
+            
+            /* Elegant text-shadow to make text pop against complex backgrounds without ugly boxes */
+            .main .stMarkdown p, 
+            .main .stMarkdown h1, 
+            .main .stMarkdown h2, 
+            .main .stMarkdown h3, 
+            .main .stMarkdown li {
+                text-shadow: 0px 2px 4px rgba(0,0,0,0.8), 0px 0px 10px rgba(0,0,0,0.5) !important;
             }
             
-            /* Remove text bubbles if they are already inside a blurred glass card or form! */
+            /* Remove text shadow inside cards where we already have a solid background */
             [data-testid="stVerticalBlockBorderWrapper"] p, 
             [data-testid="stVerticalBlockBorderWrapper"] h1, 
             [data-testid="stVerticalBlockBorderWrapper"] h2, 
@@ -148,13 +143,9 @@ hide_st_style = """
             [data-testid="stPopoverBody"] h2,
             [data-testid="stPopoverBody"] h3,
             [data-testid="stPopoverBody"] li {
-                background-color: transparent !important;
-                backdrop-filter: none !important;
-                padding: 0 !important;
-                box-shadow: none !important;
-                width: auto !important;
+                text-shadow: none !important;
             }
-
+            
             /* Push main content down so it doesn't hide behind the navbar */
             .block-container {
                 padding-top: 70px !important;
