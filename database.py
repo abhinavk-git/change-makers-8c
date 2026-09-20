@@ -164,6 +164,11 @@ def _save_users_local(users_dict):
     with open(USERS_FILE, "w") as f: json.dump(users_dict, f, indent=4)
 
 def get_user_role(username):
+    if not isinstance(username, str):
+        try:
+            username = str(username)
+        except:
+            return "viewer"
     username = username.lower().strip()
     if username == "abhinavk":
         return "super_admin"

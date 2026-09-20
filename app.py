@@ -95,7 +95,7 @@ cookie_manager = stx.CookieManager()
 
 stored_username = cookie_manager.get(cookie="cm_username")
 
-if stored_username and not st.session_state.logged_in and not st.session_state.get("ignore_cookie", False):
+if stored_username and isinstance(stored_username, str) and not st.session_state.logged_in and not st.session_state.get("ignore_cookie", False):
     role = db.get_user_role(stored_username)
     if role != "banned":
         st.session_state.logged_in = True
