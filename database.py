@@ -149,3 +149,55 @@ def delete_model(model_id):
         models = _load_local()
         models = [m for m in models if m["id"] != model_id]
         _save_local(models)
+
+# === USER MANAGEMENT ===
+USERS_FILE = "users.json"
+def _load_users_local():
+    if not os.path.exists(USERS_FILE): return {}
+    try:
+        with open(USERS_FILE, "r") as f: return json.load(f)
+    except: return {}
+
+def _save_users_local(users_dict):
+    with open(USERS_FILE, "w") as f: json.dump(users_dict, f, indent=4)
+
+def get_user_role(username):
+    username = username.lower().strip()
+    if username == "abhinavk":
+        return "super_admin"
+        
+    if USE_FIREBASE:
+        doc_ref = db.collection('users').document(username)
+        doc = doc_ref.get()
+        if doc.exists:
+            return doc.to_dict().get("role", "viewer")
+        else:
+            doc_ref.set({"role": "viewer"})
+            return "viewer"
+    else:
+        users = _load_users_local()
+        if username in users:
+            return users[username]
+        else:
+            users[username] = "viewer"
+            _save_users_local(users)
+            return "viewer"
+
+def set_user_role(username, role):
+    username = username.lower().strip()
+    if username == "abhinavk": return # Cannot change super admin
+    
+    if USE_FIREBASE:
+        db.collection('users').document(username).set({"role": role})
+    else:
+        users = _load_users_local()
+        users[username] = role
+        _save_users_local(users)
+
+def get_all_users():
+    if USE_FIREBASE:
+        users_ref = db.collection('users').stream()
+        # Return dict of username: role
+        return {doc.id: doc.to_dict().get("role", "viewer") for doc in users_ref}
+    else:
+        return _load_users_local()

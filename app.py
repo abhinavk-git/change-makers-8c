@@ -74,6 +74,7 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "username" not in st.session_state:
     st.session_state.username = ""
+    st.session_state.role = "viewer"
 
 # --- COOKIE MANAGER (24 HR PERSISTENT LOGIN) ---
 cookie_manager = stx.CookieManager()
@@ -82,6 +83,7 @@ stored_username = cookie_manager.get(cookie="cm_username")
 if stored_username and not st.session_state.logged_in:
     st.session_state.logged_in = True
     st.session_state.username = stored_username
+    st.session_state.role = db.get_user_role(stored_username)
     st.rerun()
 
 if not st.session_state.logged_in:
@@ -105,6 +107,7 @@ if not st.session_state.logged_in:
                             user = auth.sign_in_with_email_and_password(fake_email, password)
                             st.session_state.logged_in = True
                             st.session_state.username = username
+                            st.session_state.role = db.get_user_role(username)
                             # Set cookie for 24 hours
                             cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
                             import time; time.sleep(1) # Wait for cookie to save
@@ -145,7 +148,8 @@ if not st.session_state.logged_in:
                     if password == correct_password and len(username.strip()) > 0:
                         st.session_state.logged_in = True
                         st.session_state.username = username.strip()
-                        cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
+                        st.session_state.role = db.get_user_role(username.strip())
+                        cookie_manager.set("cm_username", username.strip(), expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
                         import time; time.sleep(1) # Wait for cookie to save
                         st.rerun()
                     else:
@@ -161,10 +165,11 @@ with st.sidebar:
     st.title("Museum Menu")
     if st.button("Dashboard", use_container_width=True):
         st.session_state.page = "Dashboard"
-    if st.button("Add a Model", use_container_width=True):
-        st.session_state.page = "Add a Model"
+    if st.session_state.role in ["admin", "super_admin"]:
+        if st.button("Add a Model", use_container_width=True):
+            st.session_state.page = "Add a Model"
         
-    if st.session_state.username.lower() == "abhinavk":
+    if st.session_state.role == "super_admin":
         if st.button("Super Admin Settings", use_container_width=True):
             st.session_state.page = "Super Admin"
             
@@ -241,8 +246,9 @@ elif page == "Dashboard":
                             st.write(m["description"])
                             
                         # Edit / Delete Section
-                        with st.expander("Edit / Delete"):
-                            with st.form(f"edit_form_{m['id']}"):
+                        if st.session_state.role in ["admin", "super_admin"]:
+                            with st.expander("Edit / Delete"):
+                                with st.form(f"edit_form_{m['id']}"):
                                 edit_title = st.text_input("Name", value=m.get("title", ""))
                                 edit_desc = st.text_area("Description", value=m.get("description", ""))
                                 edit_img = st.file_uploader("New Image (optional)", type=["jpg", "jpeg", "png", "webp"])
@@ -278,4 +284,25 @@ if page == "Super Admin":
             st.success("Backup functionality coming soon.")
             
     st.subheader("User Management")
-    st.info("Currently, anyone with the master password can log in. In the future, you can manage individual user accounts here.")
+    users_dict = db.get_all_users()
+    
+    if not users_dict:
+        st.info("No users have logged in yet.")
+    else:
+        for u_name, u_role in users_dict.items():
+            if u_name.lower() == "abhinavk": continue # Cannot change super admin
+            
+            with st.container():
+                ucol1, ucol2, ucol3 = st.columns([2, 1, 1])
+                with ucol1:
+                    st.write(f"**{u_name}** ({u_role})")
+                with ucol2:
+                    if u_role != "admin" and st.button(f"Promote to Admin", key=f"promo_{u_name}"):
+                        db.set_user_role(u_name, "admin")
+                        st.rerun()
+                with ucol3:
+                    if u_role != "viewer" and st.button(f"Demote to Viewer", key=f"demo_{u_name}"):
+                        db.set_user_role(u_name, "viewer")
+                        st.rerun()
+                st.markdown("---")
+
