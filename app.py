@@ -44,7 +44,50 @@ hide_st_style = """
             div.stButton > button {
                 border-radius: 0px !important;
             }
-                        </style>
+            
+            /* Lichess style Top Navbar background */
+            .block-container::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 50px;
+                background-color: #262421;
+                border-bottom: 2px solid #ff4b4b;
+                z-index: 999998;
+            }
+            
+            /* Pin the popover button to the right side of the Navbar */
+            div[data-testid="stPopover"] {
+                position: fixed !important;
+                top: 5px !important;
+                right: 20px !important;
+                z-index: 999999 !important;
+            }
+            
+            /* Style the button itself to look like Lichess */
+            div[data-testid="stPopover"] button {
+                background-color: transparent !important;
+                border: none !important;
+                color: #c9c8c5 !important;
+                font-weight: bold;
+                padding: 5px 15px !important;
+                height: 40px !important;
+                box-shadow: none !important;
+            }
+            
+            div[data-testid="stPopover"] button:hover {
+                color: white !important;
+                background-color: #363431 !important;
+                transform: none !important;
+            }
+            
+            /* Push main content down so it doesn't hide behind the navbar */
+            .block-container {
+                padding-top: 70px !important;
+            }
+            </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
@@ -295,7 +338,7 @@ page = st.session_state.page
 unread_count = db.get_unread_count(st.session_state.username)
 bell_icon = f"💬 Chat ({unread_count})" if unread_count > 0 else "💬 Chat"
 
-st.markdown('<div id="chat-anchor"></div>', unsafe_allow_html=True)
+
 with st.popover(bell_icon):
         st.subheader("Direct Messages")
         
@@ -329,41 +372,7 @@ with st.popover(bell_icon):
                     st.caption(m['timestamp'])
                     st.write(m['text'])
 
-# Inject JS to aggressively position the chat popover like Lichess (bottom right)
-import streamlit.components.v1 as components
-components.html('''
-<script>
-    // Find the anchor and then find the adjacent popover
-    const anchor = parent.document.getElementById('chat-anchor');
-    if (anchor) {
-        // The anchor is inside a markdown div -> element-container
-        const anchorContainer = anchor.closest('.element-container');
-        // The popover is the next element-container
-        const popoverContainer = anchorContainer.nextElementSibling;
-        
-        if (popoverContainer) {
-            popoverContainer.style.position = 'fixed';
-            popoverContainer.style.bottom = '0px';
-            popoverContainer.style.right = '30px';
-            popoverContainer.style.zIndex = '999999';
-            popoverContainer.style.width = 'auto';
-            
-            // Make the button itself look like a Lichess chat tab
-            const btn = popoverContainer.querySelector('button');
-            if (btn) {
-                btn.style.backgroundColor = '#262421';
-                btn.style.color = '#c9c8c5';
-                btn.style.border = '1px solid #403e3c';
-                btn.style.borderBottom = 'none';
-                btn.style.borderRadius = '5px 5px 0 0 !important';
-                btn.style.padding = '10px 20px';
-                btn.style.fontWeight = 'bold';
-                btn.style.boxShadow = '0px -2px 10px rgba(0,0,0,0.5)';
-            }
-        }
-    }
-</script>
-''', height=0)
+
     
     
 # --- PAGE: ABOUT US ---
