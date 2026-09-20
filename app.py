@@ -22,6 +22,13 @@ hide_st_style = """
             [data-testid="stViewerBadge"] {display: none !important;}
             div[class^='viewerBadge'] {display: none !important;}
             div[class*='viewerBadge'] {display: none !important;}
+
+            [data-testid="stSidebar"] div[data-testid="stVerticalBlock"] {
+                height: 100%; min-height: calc(100vh - 8rem);
+            }
+            div.element-container:has(.bottom-spacer) {
+                flex-grow: 1;
+            }
             div.stButton > button {
                 border-radius: 0px !important;
             }
@@ -186,7 +193,7 @@ with st.sidebar:
         if st.button("Super Admin Settings", use_container_width=True):
             st.session_state.page = "Super Admin"
             
-    st.markdown("<br>" * 18, unsafe_allow_html=True) # Push to bottom
+    st.markdown('<div class="bottom-spacer"></div>', unsafe_allow_html=True)
     
     # Profile Indicator with Circle
     first_letter = st.session_state.username[0].upper() if st.session_state.username else "?"
