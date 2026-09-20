@@ -19,7 +19,41 @@ if st.session_state.theme == "Light":
 
 
 
+import base64
+import os
+
+def get_base64_of_bin_file(bin_file):
+    if not os.path.exists(bin_file): return ""
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+image_path = ".user_uploaded/media_1789917285876.jpg"
+b64 = get_base64_of_bin_file(image_path)
+
+bg_css = f'''
+<style>
+.stApp::before {{
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/jpeg;base64,{b64}");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    filter: blur(8px) brightness(0.4); /* Blur and darken for readability */
+    z-index: -1;
+}}
+/* Make sure the main containers are transparent so the background shows through */
+.stApp {{
+    background-color: transparent !important;
+}}
+</style>
+'''
+st.markdown(bg_css, unsafe_allow_html=True)
+
 hide_st_style = """<style>
+
             #MainMenu {visibility: hidden;}
             header {visibility: hidden;}
             footer {visibility: hidden; display: none;}
@@ -52,7 +86,8 @@ hide_st_style = """<style>
                 left: 0;
                 right: 0;
                 height: 50px;
-                background-color: #262421;
+                background-color: rgba(38, 36, 33, 0.75);
+                backdrop-filter: blur(15px);
                 border-bottom: 2px solid #C5A059;
                 z-index: 999998;
             }
@@ -100,6 +135,13 @@ hide_st_style = """<style>
                 max-width: none !important;
                 padding-left: 5% !important;
                 padding-right: 5% !important;
+                background-color: transparent !important;
+            }
+            
+            /* Make sidebar transparent glass */
+            [data-testid="stSidebar"] {
+                background-color: rgba(38, 36, 33, 0.7) !important;
+                backdrop-filter: blur(15px) !important;
             }
             
             """
