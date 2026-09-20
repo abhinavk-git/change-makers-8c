@@ -60,6 +60,7 @@ hide_st_style = """<style>
             
             /* Pin the popover button to the right side of the Navbar */
             div[data-testid="stPopover"] {
+                transform: none !important;
                 position: fixed !important;
                 top: 5px !important;
                 right: 20px !important;
@@ -95,6 +96,7 @@ hide_st_style = """<style>
             
             /* Force the popover menu to appear on the right side under the button */
             div[data-testid="stPopoverBody"] {
+                transform: none !important;
                 right: 20px !important;
                 left: auto !important;
                 top: 55px !important;
