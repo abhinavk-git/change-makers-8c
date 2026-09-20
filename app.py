@@ -185,9 +185,8 @@ with st.sidebar:
     st.title("Museum Menu")
     if st.button("Dashboard", use_container_width=True):
         st.session_state.page = "Dashboard"
-    if st.session_state.role in ["admin", "super_admin"]:
-        if st.button("Add a Model", use_container_width=True):
-            st.session_state.page = "Add a Model"
+    if st.button("Add a Model", use_container_width=True):
+        st.session_state.page = "Add a Model"
         
     if st.session_state.role == "super_admin":
         if st.button("Super Admin Settings", use_container_width=True):
@@ -272,8 +271,12 @@ elif page == "Add a Model":
         if submitted:
             if title:
                 with st.spinner("Uploading..."):
-                    db.add_model(title, desc, img, uploader=st.session_state.username)
-                st.success("Model added successfully! Switch to the Dashboard to see it.")
+                    status = "approved" if st.session_state.role == "super_admin" else "pending"
+                    db.add_model(title, desc, img, uploader=st.session_state.username, status=status)
+                if status == "approved":
+                    st.success("Model added successfully! Switch to the Dashboard to see it.")
+                else:
+                    st.success("Model submitted for verification! A Super Admin will review it shortly.")
             else:
                 st.error("Please provide at least a name for the model.")
     
@@ -283,7 +286,8 @@ elif page == "Dashboard":
     st.markdown("welcome to model museum")
 
     # --- MAIN CONTENT: GALLERY ---
-    models = db.load_models()
+    all_models = db.load_models()
+    models = [m for m in all_models if m.get("status", "approved") == "approved"]
 
     if not models:
         st.info("The museum is currently empty. Go to 'Add a Model' in the sidebar to be the first!")
@@ -333,6 +337,30 @@ if page == "Super Admin":
     st.markdown(f"Welcome to the master control panel, **{st.session_state.username}**.")
     
     
+    st.subheader("Model Verification Queue")
+    all_models = db.load_models()
+    pending_models = [m for m in all_models if m.get("status") == "pending"]
+    if not pending_models:
+        st.info("No models pending verification.")
+    else:
+        for m in pending_models:
+            with st.container():
+                st.write(f"**{m.get('title', 'Untitled')}** by {m.get('uploader', 'Unknown')}")
+                if m.get("image_url"):
+                    st.image(m["image_url"], width=200)
+                if m.get("description"):
+                    st.write(m["description"])
+                col1, col2, _ = st.columns([1, 1, 4])
+                with col1:
+                    if st.button("Approve", key=f"app_{m['id']}"):
+                        db.update_model_status(m['id'], "approved")
+                        st.rerun()
+                with col2:
+                    if st.button("Reject", key=f"rej_{m['id']}"):
+                        db.delete_model(m['id'])
+                        st.rerun()
+                st.markdown("---")
+                
     st.subheader("User Management")
     users_dict = db.get_all_users()
     
