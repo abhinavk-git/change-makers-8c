@@ -204,6 +204,15 @@ with st.sidebar:
     
     if st.button("My Profile", use_container_width=True):
         st.session_state.page = "My Profile"
+    
+    if st.button("Logout", use_container_width=True):
+        st.session_state.logged_in = False
+        st.session_state.username = ""
+        st.session_state.role = "viewer"
+        st.session_state.page = "Dashboard"
+        cookie_manager.delete("cm_username")
+        import time; time.sleep(1)
+        st.rerun()
 
 page = st.session_state.page
 
