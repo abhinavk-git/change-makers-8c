@@ -57,11 +57,7 @@ if "username" not in st.session_state:
     st.session_state.username = ""
 
 # --- COOKIE MANAGER (24 HR PERSISTENT LOGIN) ---
-@st.cache_resource(experimental_allow_widgets=True)
-def get_cookie_manager():
-    return stx.CookieManager()
-
-cookie_manager = get_cookie_manager()
+cookie_manager = stx.CookieManager()
 
 stored_username = cookie_manager.get(cookie="cm_username")
 if stored_username and not st.session_state.logged_in:
