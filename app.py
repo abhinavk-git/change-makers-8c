@@ -58,15 +58,6 @@ hide_st_style = """<style>
                 z-index: 999998;
             }
             
-            
-            /* Robust target for the popover button container using the marker */
-            div[data-testid="stVerticalBlock"] > div.element-container:has(#bell-target) + div.element-container {
-                position: fixed !important;
-                top: 5px !important;
-                right: 20px !important;
-                z-index: 999999 !important;
-                width: auto !important;
-            }
 
             /* Pin the popover button to the right side of the Navbar */
             div[data-testid="stPopover"] {
@@ -377,7 +368,6 @@ unread_count = db.get_unread_count(st.session_state.username)
 bell_icon = f"🔔 Notifications ({unread_count})" if unread_count > 0 else "🔔 Notifications"
 
 
-st.markdown('<div id="bell-target"></div>', unsafe_allow_html=True)
 with st.popover(bell_icon):
         st.subheader("Direct Messages")
         
