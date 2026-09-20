@@ -116,6 +116,45 @@ hide_st_style = """
                 border: 1px solid rgba(197, 160, 89, 0.3) !important;
             }
 
+            
+            /* Text Bubbles: Apply glass specifically to text elements so they hug the text */
+            .main div.stMarkdown p, 
+            .main div.stMarkdown h1, 
+            .main div.stMarkdown h2, 
+            .main div.stMarkdown h3, 
+            .main div.stMarkdown li {
+                background-color: rgba(38, 36, 33, 0.75) !important;
+                backdrop-filter: blur(12px) !important;
+                padding: 5px 12px !important;
+                border-radius: 6px !important;
+                box-shadow: 0px 4px 10px rgba(0,0,0,0.3) !important;
+                width: fit-content !important;
+                margin-bottom: 5px;
+            }
+            
+            /* Remove text bubbles if they are already inside a blurred glass card or form! */
+            [data-testid="stVerticalBlockBorderWrapper"] p, 
+            [data-testid="stVerticalBlockBorderWrapper"] h1, 
+            [data-testid="stVerticalBlockBorderWrapper"] h2, 
+            [data-testid="stVerticalBlockBorderWrapper"] h3,
+            [data-testid="stVerticalBlockBorderWrapper"] li,
+            [data-testid="stForm"] p,
+            [data-testid="stForm"] h1,
+            [data-testid="stForm"] h2,
+            [data-testid="stForm"] h3,
+            [data-testid="stForm"] li,
+            [data-testid="stPopoverBody"] p,
+            [data-testid="stPopoverBody"] h1,
+            [data-testid="stPopoverBody"] h2,
+            [data-testid="stPopoverBody"] h3,
+            [data-testid="stPopoverBody"] li {
+                background-color: transparent !important;
+                backdrop-filter: none !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                width: auto !important;
+            }
+
             /* Push main content down so it doesn't hide behind the navbar */
             .block-container {
                 padding-top: 70px !important;
