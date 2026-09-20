@@ -229,3 +229,82 @@ def save_feedback(username, text):
     }
     feedback.append(entry)
     with open(FEEDBACK_FILE, "w") as f: json.dump(feedback, f, indent=4)
+
+def delete_feedback(feedback_id):
+    feedback = get_all_feedback()
+    feedback = [f for f in feedback if f.get("id") != feedback_id]
+    with open(FEEDBACK_FILE, "w") as f: json.dump(feedback, f, indent=4)
+
+# --- BANS & APPEALS ---
+BANS_FILE = "bans.json"
+
+def _load_bans():
+    if not os.path.exists(BANS_FILE): return {}
+    try:
+        with open(BANS_FILE, "r") as f: return json.load(f)
+    except: return {}
+
+def _save_bans(bans_dict):
+    with open(BANS_FILE, "w") as f: json.dump(bans_dict, f, indent=4)
+
+def get_user_bans(username):
+    bans = _load_bans()
+    return bans.get(username, [])
+
+def get_active_ban(username):
+    bans = get_user_bans(username)
+    for b in bans:
+        if b.get("active", False):
+            return b
+    return None
+
+def ban_user_with_reason(username, reason):
+    import datetime
+    bans = _load_bans()
+    if username not in bans:
+        bans[username] = []
+    
+    # Mark any existing active bans as inactive
+    for b in bans[username]:
+        b["active"] = False
+        
+    bans[username].append({
+        "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "reason": reason,
+        "active": True,
+        "appeal": None,
+        "appeal_status": None
+    })
+    _save_bans(bans)
+    set_user_role(username, "banned")
+
+def submit_ban_appeal(username, appeal_text):
+    bans = _load_bans()
+    if username in bans:
+        for b in bans[username]:
+            if b.get("active", False):
+                b["appeal"] = appeal_text
+                b["appeal_status"] = "pending"
+                break
+    _save_bans(bans)
+
+def resolve_ban_appeal(username, unban=True):
+    bans = _load_bans()
+    if username in bans:
+        for b in bans[username]:
+            if b.get("active", False):
+                b["active"] = not unban
+                b["appeal_status"] = "approved" if unban else "rejected"
+                break
+    _save_bans(bans)
+    if unban:
+        set_user_role(username, "viewer")
+
+def get_pending_appeals():
+    bans = _load_bans()
+    appeals = []
+    for uname, user_bans in bans.items():
+        for b in user_bans:
+            if b.get("active", False) and b.get("appeal_status") == "pending":
+                appeals.append({"username": uname, "appeal": b.get("appeal"), "reason": b.get("reason")})
+    return appeals

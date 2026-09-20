@@ -136,7 +136,22 @@ if not st.session_state.logged_in:
                             user = auth.sign_in_with_email_and_password(fake_email, password)
                             role = db.get_user_role(username)
                             if role == "banned":
-                                st.error("This account has been banned from the museum.")
+                                active_ban = db.get_active_ban(username)
+                                reason = active_ban.get("reason", "No reason provided.") if active_ban else "Violations of policy."
+                                st.error(f"**ACCOUNT BANNED**\n\n**Reason:** {reason}")
+                                
+                                if active_ban and active_ban.get("appeal_status") == "pending":
+                                    st.info("Your appeal is currently under review by the Owner.")
+                                else:
+                                    with st.expander("Appeal Ban"):
+                                        with st.form("appeal_form"):
+                                            appeal_text = st.text_area("Why should your ban be lifted?")
+                                            if st.form_submit_button("Submit Appeal"):
+                                                if appeal_text.strip():
+                                                    db.submit_ban_appeal(username, appeal_text.strip())
+                                                    st.success("Appeal submitted successfully.")
+                                                else:
+                                                    st.error("Please enter an appeal message.")
                             else:
                                 st.session_state.ignore_cookie = False
                                 st.session_state.logged_in = True
@@ -192,7 +207,22 @@ if not st.session_state.logged_in:
                     if password == correct_password and len(username.strip()) > 0:
                         role = db.get_user_role(username.strip())
                         if role == "banned":
-                            st.error("This account has been banned by an administrator.")
+                            active_ban = db.get_active_ban(username.strip())
+                            reason = active_ban.get("reason", "No reason provided.") if active_ban else "Violations of policy."
+                            st.error(f"**ACCOUNT BANNED**\n\n**Reason:** {reason}")
+                            
+                            if active_ban and active_ban.get("appeal_status") == "pending":
+                                st.info("Your appeal is currently under review by the Owner.")
+                            else:
+                                with st.expander("Appeal Ban"):
+                                    with st.form("appeal_form2"):
+                                        appeal_text = st.text_area("Why should your ban be lifted?")
+                                        if st.form_submit_button("Submit Appeal"):
+                                            if appeal_text.strip():
+                                                db.submit_ban_appeal(username.strip(), appeal_text.strip())
+                                                st.success("Appeal submitted successfully.")
+                                            else:
+                                                st.error("Please enter an appeal message.")
                         else:
                             st.session_state.ignore_cookie = False
                             st.session_state.logged_in = True
@@ -510,6 +540,123 @@ elif page == "Approve a Model" and st.session_state.role == "super_admin":
                 st.markdown("---")
 
 # --- PAGE: SUPER ADMIN ---
+
+if page == "Super Admin":
+    if st.session_state.username.lower() != "abhinavk":
+        st.error("Access Denied.")
+        st.stop()
+        
+    st.title("User Management")
+    st.markdown(f"Welcome to the owner control panel, **{st.session_state.username}**.")
+    
+    users_dict = db.get_all_users()
+    
+    # 1. Show Appeal Notifications
+    pending_appeals = db.get_pending_appeals()
+    if pending_appeals:
+        st.error("🚨 **ACTION REQUIRED: PENDING BAN APPEALS** 🚨")
+        for app in pending_appeals:
+            with st.container(border=True):
+                st.write(f"**User:** {app['username']}")
+                st.write(f"**Original Ban Reason:** {app['reason']}")
+                st.write(f"**Appeal Message:** {app['appeal']}")
+                col1, col2 = st.columns(2)
+                with col1:
+                    if st.button(f"Approve Appeal (Unban)##{app['username']}", type="primary"):
+                        db.resolve_ban_appeal(app['username'], unban=True)
+                        st.toast(f"{app['username']} has been unbanned.")
+                        st.rerun()
+                with col2:
+                    if st.button(f"Reject Appeal##{app['username']}"):
+                        db.resolve_ban_appeal(app['username'], unban=False)
+                        st.toast(f"Appeal from {app['username']} rejected.")
+                        st.rerun()
+        st.markdown("---")
+    
+    # 2. User Selection
+    if not users_dict:
+        st.info("No users have logged in yet.")
+    else:
+        user_list = [u for u in users_dict.keys() if u.lower() != "abhinavk"]
+        if not user_list:
+            st.info("No other users exist yet.")
+        else:
+            selected_user = st.selectbox("Select a User to moderate:", ["-- Select User --"] + user_list)
+            
+            if selected_user != "-- Select User --":
+                u_role = users_dict[selected_user]
+                st.markdown(f"### Profile: **{selected_user}** ({u_role.upper()})")
+                
+                tab1, tab2, tab3 = st.tabs(["Role Management", "Ban History", "Feedback Submitted"])
+                
+                with tab1:
+                    st.subheader("Manage Role")
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if u_role == "viewer":
+                            if st.button("Promote to Admin", use_container_width=True):
+                                db.set_user_role(selected_user, "admin")
+                                st.rerun()
+                        elif u_role == "admin":
+                            if st.button("Promote to Super Admin", use_container_width=True):
+                                db.set_user_role(selected_user, "super_admin")
+                                st.rerun()
+                        elif u_role == "super_admin":
+                            if st.button("Demote to Admin", use_container_width=True):
+                                db.set_user_role(selected_user, "admin")
+                                st.rerun()
+                    with col2:
+                        if u_role == "admin":
+                            if st.button("Demote to Viewer", use_container_width=True):
+                                db.set_user_role(selected_user, "viewer")
+                                st.rerun()
+                    
+                    st.markdown("---")
+                    st.subheader("Ban User")
+                    if u_role == "banned":
+                        if st.button("Unban User", type="primary"):
+                            db.resolve_ban_appeal(selected_user, unban=True)
+                            st.rerun()
+                    else:
+                        with st.form("ban_form"):
+                            ban_reason = st.text_area("Reason for banning:")
+                            if st.form_submit_button("Ban User", type="primary"):
+                                if ban_reason.strip():
+                                    db.ban_user_with_reason(selected_user, ban_reason.strip())
+                                    st.success(f"{selected_user} has been banned.")
+                                    st.rerun()
+                                else:
+                                    st.error("You must provide a reason for the ban.")
+                
+                with tab2:
+                    st.subheader("Ban History")
+                    bans = db.get_user_bans(selected_user)
+                    if not bans:
+                        st.info("No ban history for this user.")
+                    else:
+                        for b in reversed(bans):
+                            with st.container(border=True):
+                                st.write(f"**Date:** {b['date']}")
+                                st.write(f"**Reason:** {b['reason']}")
+                                st.write(f"**Status:** {'Active' if b['active'] else 'Resolved'}")
+                                if b.get('appeal'):
+                                    st.write(f"**Appeal Message:** {b['appeal']} ({b.get('appeal_status', 'N/A')})")
+                
+                with tab3:
+                    st.subheader("Feedback Submitted")
+                    all_fb = db.get_all_feedback()
+                    user_fb = [f for f in all_fb if f.get("username") == selected_user]
+                    if not user_fb:
+                        st.info("This user has not submitted any feedback.")
+                    else:
+                        for fb in reversed(user_fb):
+                            with st.container(border=True):
+                                st.write(f"**Date:** {fb.get('date', 'Unknown')}")
+                                st.write(fb.get('text', ''))
+                                if st.button(f"Delete Feedback##{fb.get('id')}"):
+                                    db.delete_feedback(fb.get("id"))
+                                    st.rerun()
+
 
 if page == "Super Admin":
     if st.session_state.username.lower() != "abhinavk":
