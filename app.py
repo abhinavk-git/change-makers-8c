@@ -6,6 +6,18 @@ from streamlit_option_menu import option_menu
 
 st.set_page_config(page_title="Change Makers 8c", page_icon="", layout="wide", initial_sidebar_state="expanded")
 
+if "theme" not in st.session_state:
+    st.session_state.theme = "Dark"
+
+if st.session_state.theme == "Light":
+    st.markdown("""
+    <style>
+        html { filter: invert(1) hue-rotate(180deg); }
+        img, video, iframe, [data-testid="stImage"] { filter: invert(1) hue-rotate(180deg); }
+    </style>
+    """, unsafe_allow_html=True)
+
+
 # --- HIDE STREAMLIT BRANDING & MENU ---
 hide_st_style = """
             <style>
@@ -255,14 +267,13 @@ if page == "My Profile":
     
     st.markdown("---")
     st.subheader("Preferences")
-    theme_choice = st.radio("App Theme", ["Dark", "Light"], horizontal=True)
-    if theme_choice == "Light":
-        st.markdown("""
-        <style>
-            html { filter: invert(1) hue-rotate(180deg); }
-            img, video, iframe, [data-testid="stImage"] { filter: invert(1) hue-rotate(180deg); }
-        </style>
-        """, unsafe_allow_html=True)
+    
+    # Map index from session state
+    theme_idx = 0 if st.session_state.theme == "Dark" else 1
+    theme_choice = st.radio("App Theme", ["Dark", "Light"], index=theme_idx, horizontal=True)
+    if theme_choice != st.session_state.theme:
+        st.session_state.theme = theme_choice
+        st.rerun()
         
     st.markdown("---")
     if st.button("Logout", type="primary"):
