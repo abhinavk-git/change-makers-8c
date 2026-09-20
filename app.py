@@ -295,7 +295,14 @@ elif page == "My Profile":
     else:
         display_role = st.session_state.role.replace("_", " ").title()
         
-    st.markdown(f"**Position:** {display_role}")
+    st.markdown(f"""
+    <div style="margin-top: 15px; margin-bottom: 25px;">
+        <span style="font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Current Position</span><br>
+        <div style="display: inline-block; background-color: #ff4b4b; color: white; padding: 8px 18px; font-weight: 900; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 8px; border: 2px solid var(--text-color); box-shadow: 4px 4px 0px var(--text-color);">
+            {display_role}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Calculate donated models
     models = db.load_models()
