@@ -46,9 +46,7 @@ hide_st_style = """
             }
             /* Pin the notification bell to the absolute top right */
             div[data-testid="stPopover"] {
-                float: right !important;
                 margin-top: -60px !important;
-                margin-right: 15px !important;
                 z-index: 999999 !important;
                 transform: scale(1.3);
                 transform-origin: top right;
@@ -296,42 +294,44 @@ with st.sidebar:
 page = st.session_state.page
 
 # --- GLOBAL NOTIFICATION BELL ---
-unread_count = db.get_unread_count(st.session_state.username)
-bell_icon = f"🔔 ({unread_count})" if unread_count > 0 else "🔔"
-with st.popover(bell_icon):
-        st.subheader("Direct Messages")
-        
-        # Message sending
-        all_users = db.get_all_users()
-        other_users = [u for u in all_users.keys() if u != st.session_state.username]
-        with st.form("send_msg_form", clear_on_submit=True):
-            recipient = st.selectbox("To:", other_users)
-            msg_text = st.text_area("Message:")
-            if st.form_submit_button("Send"):
-                if recipient and msg_text.strip():
-                    db.send_message(st.session_state.username, recipient, msg_text.strip())
-                    st.success("Sent!")
-        
-        st.markdown("---")
-        if unread_count > 0:
-            if st.button("Mark all as read", type="primary", use_container_width=True):
-                db.mark_messages_read(st.session_state.username)
-                st.rerun()
-                
-        # Message list
-        msgs = db.get_messages_for_user(st.session_state.username)
-        if not msgs:
-            st.info("No messages.")
-        else:
-            for m in reversed(msgs[-20:]): # Only show last 20 messages
-                with st.container(border=True):
-                    is_unread = not m["read"] and m["recipient"] == st.session_state.username
-                    dot = "🔵 " if is_unread else ""
-                    st.markdown(f"{dot}**From:** {m['sender']} | **To:** {m['recipient']}")
-                    st.caption(m['timestamp'])
-                    st.write(m['text'])
-
-
+tcol1, tcol2 = st.columns([10, 1])
+with tcol2:
+    unread_count = db.get_unread_count(st.session_state.username)
+    bell_icon = f"🔔 ({unread_count})" if unread_count > 0 else "🔔"
+    with st.popover(bell_icon):
+            st.subheader("Direct Messages")
+            
+            # Message sending
+            all_users = db.get_all_users()
+            other_users = [u for u in all_users.keys() if u != st.session_state.username]
+            with st.form("send_msg_form", clear_on_submit=True):
+                recipient = st.selectbox("To:", other_users)
+                msg_text = st.text_area("Message:")
+                if st.form_submit_button("Send"):
+                    if recipient and msg_text.strip():
+                        db.send_message(st.session_state.username, recipient, msg_text.strip())
+                        st.success("Sent!")
+            
+            st.markdown("---")
+            if unread_count > 0:
+                if st.button("Mark all as read", type="primary", use_container_width=True):
+                    db.mark_messages_read(st.session_state.username)
+                    st.rerun()
+                    
+            # Message list
+            msgs = db.get_messages_for_user(st.session_state.username)
+            if not msgs:
+                st.info("No messages.")
+            else:
+                for m in reversed(msgs[-20:]): # Only show last 20 messages
+                    with st.container(border=True):
+                        is_unread = not m["read"] and m["recipient"] == st.session_state.username
+                        dot = "🔵 " if is_unread else ""
+                        st.markdown(f"{dot}**From:** {m['sender']} | **To:** {m['recipient']}")
+                        st.caption(m['timestamp'])
+                        st.write(m['text'])
+    
+    
 # --- PAGE: ABOUT US ---
 if page == "About Us":
     st.markdown("""
