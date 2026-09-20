@@ -131,7 +131,13 @@ if not st.session_state.logged_in:
                             import time; time.sleep(1) # Wait for cookie to save
                             st.rerun()
                         except Exception as e:
-                            st.error("Invalid username or password.")
+                            try:
+                                import json
+                                error_json = e.args[1]
+                                error_data = json.loads(error_json)
+                                st.error(f"Login failed: {error_data['error']['message']}")
+                            except:
+                                st.error(f"Login failed: {str(e)}")
                             
             with tab2:
                 with st.form("signup_form"):
@@ -143,7 +149,13 @@ if not st.session_state.logged_in:
                             user = auth.create_user_with_email_and_password(fake_email, new_password)
                             st.success(f"Account '{new_username}' created successfully! Please log in on the other tab.")
                         except Exception as e:
-                            st.error("Username might already be taken, or password is too short.")
+                            try:
+                                import json
+                                error_json = e.args[1]
+                                error_data = json.loads(error_json)
+                                st.error(f"Error creating account: {error_data['error']['message']}")
+                            except:
+                                st.error(f"Error creating account: {str(e)}")
         else:
             if firebase_setup_error:
                 st.error(f" Firebase Error: {firebase_setup_error}")
