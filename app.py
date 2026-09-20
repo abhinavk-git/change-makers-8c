@@ -118,32 +118,25 @@ hide_st_style = """
 
             
             
-            /* Elegant text-shadow to make text pop against complex backgrounds without ugly boxes */
-            .main .stMarkdown p, 
-            .main .stMarkdown h1, 
-            .main .stMarkdown h2, 
-            .main .stMarkdown h3, 
-            .main .stMarkdown li {
-                text-shadow: 0px 2px 4px rgba(0,0,0,0.8), 0px 0px 10px rgba(0,0,0,0.5) !important;
+            
+            /* Blur the background exactly in the shape of standalone text blocks */
+            div[data-testid="stMarkdownContainer"] {
+                background-color: rgba(38, 36, 33, 0.6) !important;
+                backdrop-filter: blur(12px) !important;
+                padding: 10px 15px !important;
+                border-radius: 8px !important;
+                border: 1px solid rgba(197, 160, 89, 0.15);
             }
             
-            /* Remove text shadow inside cards where we already have a solid background */
-            [data-testid="stVerticalBlockBorderWrapper"] p, 
-            [data-testid="stVerticalBlockBorderWrapper"] h1, 
-            [data-testid="stVerticalBlockBorderWrapper"] h2, 
-            [data-testid="stVerticalBlockBorderWrapper"] h3,
-            [data-testid="stVerticalBlockBorderWrapper"] li,
-            [data-testid="stForm"] p,
-            [data-testid="stForm"] h1,
-            [data-testid="stForm"] h2,
-            [data-testid="stForm"] h3,
-            [data-testid="stForm"] li,
-            [data-testid="stPopoverBody"] p,
-            [data-testid="stPopoverBody"] h1,
-            [data-testid="stPopoverBody"] h2,
-            [data-testid="stPopoverBody"] h3,
-            [data-testid="stPopoverBody"] li {
-                text-shadow: none !important;
+            /* DO NOT apply this blur to text that is already inside a blurred container (like cards, sidebars, forms) */
+            [data-testid="stSidebar"] div[data-testid="stMarkdownContainer"],
+            [data-testid="stVerticalBlockBorderWrapper"] div[data-testid="stMarkdownContainer"],
+            [data-testid="stForm"] div[data-testid="stMarkdownContainer"],
+            [data-testid="stPopoverBody"] div[data-testid="stMarkdownContainer"] {
+                background-color: transparent !important;
+                backdrop-filter: none !important;
+                padding: 0 !important;
+                border: none !important;
             }
             
             /* Push main content down so it doesn't hide behind the navbar */
@@ -179,7 +172,7 @@ hide_st_style = """
 
             </style>
             """
-st.markdown(hide_st_style, unsafe_allow_html=True)
+
 
 
 # --- FIREBASE AUTHENTICATION SETUP ---
@@ -383,6 +376,7 @@ if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
 
 with st.sidebar:
+    st.markdown(hide_st_style, unsafe_allow_html=True)
     st.title("Museum Menu")
     if st.button("Dashboard", use_container_width=True):
         st.session_state.page = "Dashboard"
