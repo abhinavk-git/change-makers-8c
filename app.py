@@ -74,7 +74,11 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "username" not in st.session_state:
     st.session_state.username = ""
-    st.session_state.role = "viewer"
+if "role" not in st.session_state:
+    if st.session_state.get("username"):
+        st.session_state.role = db.get_user_role(st.session_state.username)
+    else:
+        st.session_state.role = "viewer"
 
 # --- COOKIE MANAGER (24 HR PERSISTENT LOGIN) ---
 cookie_manager = stx.CookieManager()
