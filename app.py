@@ -62,9 +62,7 @@ if st.session_state.theme == "Museum":
     """
 
 # --- HIDE STREAMLIT BRANDING & MENU ---
-hide_st_style = f"""
-            <style>
-{museum_css}
+hide_st_style = "<style>\n" + museum_css + """
             #MainMenu {visibility: hidden;}
             header {visibility: hidden;}
             footer {visibility: hidden; display: none;}
