@@ -46,9 +46,9 @@ hide_st_style = """
             }
             /* Pin the notification bell to the absolute top right */
             div[data-testid="stPopover"] {
-                position: fixed !important;
-                top: 15px !important;
-                right: 25px !important;
+                float: right !important;
+                margin-top: -60px !important;
+                margin-right: 15px !important;
                 z-index: 999999 !important;
                 transform: scale(1.3);
                 transform-origin: top right;
