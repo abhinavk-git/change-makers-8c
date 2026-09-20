@@ -513,7 +513,8 @@ elif page == "My Profile":
     st.subheader("Preferences")
     
     if USE_FIREBASE_AUTH:
-        with st.expander("Change Password"):
+        if auth:
+            st.markdown("<br><h3 style='color: #C5A059;'>Change Password</h3>", unsafe_allow_html=True)
             with st.form("change_password_form", clear_on_submit=True):
                 current_pw = st.text_input("Current Password", type="password")
                 new_pw = st.text_input("New Password", type="password")
