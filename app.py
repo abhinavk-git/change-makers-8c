@@ -185,8 +185,8 @@ with st.sidebar:
     st.title("Museum Menu")
     if st.button("Dashboard", use_container_width=True):
         st.session_state.page = "Dashboard"
-    if st.button("Add a Model", use_container_width=True):
-        st.session_state.page = "Add a Model"
+    if st.button("Send a Model", use_container_width=True):
+        st.session_state.page = "Send a Model"
         
     if st.session_state.role == "super_admin":
         if st.button("Super Admin Settings", use_container_width=True):
@@ -258,8 +258,8 @@ if page == "My Profile":
         st.rerun()
 
 # --- PAGE: ADD A MODEL ---
-elif page == "Add a Model":
-    st.title("Add a New Model")
+elif page == "Send a Model":
+    st.title("Send a New Model")
     st.markdown("Fill out the details below to add a new model to the museum.")
     
     with st.form("add_model_form", clear_on_submit=True):
@@ -267,7 +267,7 @@ elif page == "Add a Model":
         desc = st.text_area("Description")
         img = st.file_uploader("Upload Image (Optional)", type=["jpg", "jpeg", "png", "webp"])
         
-        submitted = st.form_submit_button("Add Model")
+        submitted = st.form_submit_button("Send Model")
         if submitted:
             if title:
                 with st.spinner("Uploading..."):
@@ -290,7 +290,7 @@ elif page == "Dashboard":
     models = [m for m in all_models if m.get("status", "approved") == "approved"]
 
     if not models:
-        st.info("The museum is currently empty. Go to 'Add a Model' in the sidebar to be the first!")
+        st.info("The museum is currently empty. Go to 'Send a Model' in the sidebar to be the first!")
     else:
         cols_per_row = 3
         for i in range(0, len(models), cols_per_row):
