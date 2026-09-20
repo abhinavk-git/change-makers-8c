@@ -169,7 +169,7 @@ with st.sidebar:
     if st.button("My Profile", use_container_width=True):
         st.session_state.page = "My Profile"
     
-    st.markdown("<br><br>", unsafe_allow_html=True) # Small space below buttons
+    st.markdown("<br>" * 15, unsafe_allow_html=True) # Push to bottom
     
     # Profile Indicator with Circle
     first_letter = st.session_state.username[0].upper() if st.session_state.username else "?"
@@ -184,23 +184,11 @@ with st.sidebar:
     </div>
     """
     st.markdown(profile_html, unsafe_allow_html=True)
-    
-    st.divider()
-    
-    if st.button("Logout", use_container_width=True):
-        st.session_state.page = "Logout"
 
 page = st.session_state.page
 
-# --- ACTION: LOGOUT ---
-if page == "Logout":
-    st.session_state.logged_in = False
-    st.session_state.username = ""
-    cookie_manager.delete("cm_username")
-    st.rerun()
-
 # --- PAGE: MY PROFILE ---
-elif page == "My Profile":
+if page == "My Profile":
     st.title("👤 My Profile")
     st.markdown(f"**Username:** {st.session_state.username}")
     st.info("In the future, you will be able to see all the models you've added right here!")
