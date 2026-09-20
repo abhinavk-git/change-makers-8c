@@ -86,6 +86,9 @@ hide_st_style = """
             /* Push main content down so it doesn't hide behind the navbar */
             .block-container {
                 padding-top: 70px !important;
+                max-width: none !important;
+                padding-left: 5% !important;
+                padding-right: 5% !important;
             }
             </style>
             """
@@ -336,7 +339,7 @@ page = st.session_state.page
 # --- GLOBAL NOTIFICATION BELL ---
 # Lichess style floating chat box using JS injection for cross-browser reliability
 unread_count = db.get_unread_count(st.session_state.username)
-bell_icon = f"💬 Chat ({unread_count})" if unread_count > 0 else "💬 Chat"
+bell_icon = f"🔔 Notifications ({unread_count})" if unread_count > 0 else "🔔 Notifications"
 
 
 with st.popover(bell_icon):
