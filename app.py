@@ -284,15 +284,7 @@ if page == "Super Admin":
     st.title("👑 Super Admin Panel")
     st.markdown(f"Welcome to the master control panel, **{st.session_state.username}**.")
     
-    st.subheader("Database Controls")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Delete All Models (DANGER)", type="primary"):
-            st.warning("This would wipe the database if connected!")
-    with col2:
-        if st.button("Export Database Backup"):
-            st.success("Backup functionality coming soon.")
-            
+    
     st.subheader("User Management")
     users_dict = db.get_all_users()
     
