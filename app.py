@@ -109,7 +109,7 @@ if "role" not in st.session_state:
     else:
         st.session_state.role = "viewer"
 
-# --- COOKIE MANAGER (24 HR PERSISTENT LOGIN) ---
+# --- COOKIE MANAGER (12 HR PERSISTENT LOGIN) ---
 cookie_manager = stx.CookieManager()
 
 # Wait for cookies to load from frontend
@@ -168,8 +168,8 @@ if not st.session_state.logged_in:
                                 st.session_state.logged_in = True
                                 st.session_state.username = username
                                 st.session_state.role = role
-                                # Set cookie for 24 hours
-                                cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
+                                # Set cookie for 12 hours
+                                cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(hours=12))
                         except Exception as e:
                             try:
                                 import json
@@ -239,7 +239,7 @@ if not st.session_state.logged_in:
                             st.session_state.logged_in = True
                             st.session_state.username = username.strip()
                             st.session_state.role = role
-                            cookie_manager.set("cm_username", username.strip(), expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
+                            cookie_manager.set("cm_username", username.strip(), expires_at=datetime.datetime.now() + datetime.timedelta(hours=12))
                     else:
                         st.error("Incorrect username or password.")
                         
