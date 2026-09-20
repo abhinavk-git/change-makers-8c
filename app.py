@@ -11,11 +11,12 @@ hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
             header {visibility: hidden;}
-            footer {visibility: hidden;}
+            footer {visibility: hidden; display: none;}
             .stDeployButton {display:none;}
             button[title="Collapse sidebar"] {display: none;}
             button[title="Expand sidebar"] {display: none;}
             [data-testid="collapsedControl"] {display: none;}
+            [data-testid="stViewerBadge"] {display: none;}
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
