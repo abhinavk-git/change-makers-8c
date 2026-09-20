@@ -226,19 +226,11 @@ if page == "My Profile":
     my_models = [m for m in models if m.get("uploader") == st.session_state.username]
     
     if st.session_state.role == "viewer":
-        st.metric("Models Donated", len(my_models))
+        pass # Viewers have no metrics yet
     elif st.session_state.role == "admin":
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Models Donated", len(my_models))
-        with col2:
-            st.metric("Models Asked For Reference", 0)
+        st.metric("Models Asked For Reference", 0)
     elif st.session_state.role == "super_admin":
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Models Donated", len(my_models))
-        with col2:
-            st.metric("Number of Models Added", len(models))
+        st.metric("Number of Models Added", len(models))
 
     
     st.markdown("---")
