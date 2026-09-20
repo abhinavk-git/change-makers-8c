@@ -44,12 +44,13 @@ hide_st_style = """
             div.stButton > button {
                 border-radius: 0px !important;
             }
-            /* Pin the notification bell to the absolute top right */
-            div[data-testid="stPopover"] {
+            /* Pin the notification bell button container to the absolute top right */
+            div.element-container:has(div[data-testid="stPopover"]) {
                 position: fixed !important;
                 top: 15px !important;
                 right: 25px !important;
                 z-index: 999999 !important;
+                width: auto !important;
             }
             </style>
             """
@@ -294,11 +295,9 @@ with st.sidebar:
 page = st.session_state.page
 
 # --- GLOBAL NOTIFICATION BELL ---
-tcol1, tcol2 = st.columns([10, 1])
-with tcol2:
-    unread_count = db.get_unread_count(st.session_state.username)
-    bell_icon = f"🔔 ({unread_count})" if unread_count > 0 else "🔔"
-    with st.popover(bell_icon):
+unread_count = db.get_unread_count(st.session_state.username)
+bell_icon = f"🔔 ({unread_count})" if unread_count > 0 else "🔔"
+with st.popover(bell_icon):
         st.subheader("Direct Messages")
         
         # Message sending
