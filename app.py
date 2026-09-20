@@ -13,7 +13,6 @@ hide_st_style = """
             header {visibility: hidden;}
             footer {visibility: hidden;}
             .stDeployButton {display:none;}
-            [data-testid="collapsedControl"] {display: none;}
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
@@ -90,6 +89,7 @@ if not st.session_state.logged_in:
                             st.session_state.username = username
                             # Set cookie for 24 hours
                             cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
+                            import time; time.sleep(1) # Wait for cookie to save
                             st.rerun()
                         except Exception as e:
                             st.error("Invalid username or password.")
@@ -130,6 +130,7 @@ if not st.session_state.logged_in:
                         st.session_state.logged_in = True
                         st.session_state.username = username
                         cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
+                        import time; time.sleep(1) # Wait for cookie to save
                         st.rerun()
                     else:
                         st.error("Incorrect username or password.")
