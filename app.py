@@ -215,6 +215,12 @@ with st.sidebar:
     if st.button(action_name, use_container_width=True):
         st.session_state.page = action_name
         
+    if st.button("About Us", use_container_width=True):
+        st.session_state.page = "About Us"
+        
+    if st.button("Feedback", use_container_width=True):
+        st.session_state.page = "Feedback"
+        
     if st.session_state.role == "super_admin":
         if st.button("Approve a Model", use_container_width=True):
             st.session_state.page = "Approve a Model"
@@ -244,8 +250,40 @@ with st.sidebar:
 
 page = st.session_state.page
 
+# --- PAGE: ABOUT US ---
+if page == "About Us":
+    st.markdown("""
+    <div style="border-bottom: 4px solid #ff4b4b; margin-bottom: 30px; padding-bottom: 10px;">
+        <h1 style="font-size: 2.5rem; margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">About Us</h1>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("""
+    Welcome to the **Model Museum**! 
+    
+    This platform is dedicated to showcasing incredible models and creations from our community. 
+    Our mission is to provide a curated, easily accessible space for everyone to share their work, 
+    learn from others, and get inspired.
+    """)
+
+# --- PAGE: FEEDBACK ---
+elif page == "Feedback":
+    st.markdown("""
+    <div style="border-bottom: 4px solid #ff4b4b; margin-bottom: 30px; padding-bottom: 10px;">
+        <h1 style="font-size: 2.5rem; margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Feedback</h1>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("We'd love to hear your thoughts! Let us know how we can improve the museum.")
+    
+    with st.form("feedback_form", clear_on_submit=True):
+        feedback_text = st.text_area("Your Feedback")
+        if st.form_submit_button("Submit"):
+            if feedback_text.strip():
+                st.success("Thank you for your feedback! We appreciate it.")
+            else:
+                st.error("Please enter some feedback before submitting.")
+
 # --- PAGE: MY PROFILE ---
-if page == "My Profile":
+elif page == "My Profile":
     st.title("My Profile")
     st.markdown(f"**Username:** {st.session_state.username}")
     
