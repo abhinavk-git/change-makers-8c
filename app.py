@@ -172,12 +172,20 @@ hide_st_style = """<style>
                 background-color: transparent !important;
             }
             
-            /* Make sidebar transparent glass */
+            /* Make sidebar transparent glass and sit above the top navbar */
             [data-testid="stSidebar"] {
                 background-color: rgba(38, 36, 33, 0.7) !important;
                 backdrop-filter: blur(15px) !important;
+                z-index: 1000000 !important;
             }
             
+            /* Move the expand button down so it's not covered by the top navbar blur */
+            [data-testid="collapsedControl"] {
+                position: fixed !important;
+                top: 65px !important;
+                left: 15px !important;
+                z-index: 1000000 !important;
+            }
             """
 
 
