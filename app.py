@@ -161,12 +161,11 @@ if "page" not in st.session_state:
 
 with st.sidebar:
     st.title("Museum Menu")
-    
     if st.button("Dashboard", use_container_width=True):
         st.session_state.page = "Dashboard"
     if st.button("Add a Model", use_container_width=True):
         st.session_state.page = "Add a Model"
-    st.markdown("<br>" * 25, unsafe_allow_html=True) # Push to bottom
+    st.markdown("<br>" * 18, unsafe_allow_html=True) # Push to bottom
     
     # Profile Indicator with Circle
     first_letter = st.session_state.username[0].upper() if st.session_state.username else "?"
