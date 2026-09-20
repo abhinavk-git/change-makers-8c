@@ -128,8 +128,6 @@ if not st.session_state.logged_in:
                             st.session_state.role = db.get_user_role(username)
                             # Set cookie for 24 hours
                             cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
-                            import time; time.sleep(1) # Wait for cookie to save
-                            st.rerun()
                         except Exception as e:
                             try:
                                 import json
@@ -185,12 +183,13 @@ if not st.session_state.logged_in:
                             st.session_state.username = username.strip()
                             st.session_state.role = role
                             cookie_manager.set("cm_username", username.strip(), expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
-                            import time; time.sleep(1) # Wait for cookie to save
-                            st.rerun()
                     else:
                         st.error("Incorrect username or password.")
                         
-    st.stop()
+    if not st.session_state.logged_in:
+        st.stop()
+    else:
+        st.rerun()
 
 # --- SIDEBAR NAVIGATION ---
 if "page" not in st.session_state:
@@ -274,7 +273,6 @@ if page == "My Profile":
         st.session_state.ignore_cookie = True
         cookie_manager.delete("cm_username")
         cookie_manager.set("cm_username", "")
-        import time; time.sleep(1)
         st.rerun()
 
 # --- PAGE: ADD A MODEL ---
