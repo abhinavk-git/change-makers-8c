@@ -391,6 +391,30 @@ if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
 
 with st.sidebar:
+
+    if st.session_state.theme == "Dark":
+        hide_st_style += """
+            /* Reset the glass effects for standard Dark mode */
+            div[data-testid="stMarkdownContainer"] {
+                background: none !important;
+                backdrop-filter: none !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+            [data-testid="stSidebar"] {
+                background-color: transparent !important;
+                backdrop-filter: none !important;
+            }
+            .block-container {
+                background-color: transparent !important;
+                backdrop-filter: none !important;
+            }
+            div[data-testid="stPopoverBody"], div[data-testid="stForm"] {
+                background-color: #262421 !important;
+                backdrop-filter: none !important;
+                border: 1px solid rgba(197, 160, 89, 0.3) !important;
+            }
+        """
     st.markdown(hide_st_style, unsafe_allow_html=True)
     st.title("Museum Menu")
     if st.button("Dashboard", use_container_width=True):
