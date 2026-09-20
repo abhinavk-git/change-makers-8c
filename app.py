@@ -205,14 +205,7 @@ with st.sidebar:
     if st.button("My Profile", use_container_width=True):
         st.session_state.page = "My Profile"
     
-    if st.button("Logout", use_container_width=True):
-        st.session_state.logged_in = False
-        st.session_state.username = ""
-        st.session_state.role = "viewer"
-        st.session_state.page = "Dashboard"
-        cookie_manager.delete("cm_username")
-        import time; time.sleep(1)
-        st.rerun()
+
 
 page = st.session_state.page
 
@@ -221,6 +214,16 @@ if page == "My Profile":
     st.title("My Profile")
     st.markdown(f"**Username:** {st.session_state.username}")
     st.info("In the future, you will be able to see all the models you've added right here!")
+    
+    st.markdown("---")
+    if st.button("Logout"):
+        st.session_state.logged_in = False
+        st.session_state.username = ""
+        st.session_state.role = "viewer"
+        st.session_state.page = "Dashboard"
+        cookie_manager.delete("cm_username")
+        import time; time.sleep(1)
+        st.rerun()
 
 # --- PAGE: ADD A MODEL ---
 elif page == "Add a Model":
