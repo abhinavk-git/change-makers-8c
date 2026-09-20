@@ -12,6 +12,9 @@ hide_st_style = """
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
             .stDeployButton {display:none;}
+            button[title="Collapse sidebar"] {display: none;}
+            button[title="Expand sidebar"] {display: none;}
+            [data-testid="collapsedControl"] {display: none;}
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
