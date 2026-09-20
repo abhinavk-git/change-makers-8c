@@ -58,49 +58,40 @@ hide_st_style = """<style>
             }
             
 
-            /* Pin the popover button to the right side of the Navbar */
-            div[data-testid="stPopover"] {
-                transform: none !important;
+            /* Pin the COLUMN containing the notification bell to top-right.
+               Fixing the column (not just the button) means Streamlit's popup JS
+               reads the correct getBoundingClientRect() and opens the menu from the
+               top-right corner, not from the original DOM center position. */
+            div[data-testid="column"]:has(div[data-testid="stPopover"]) {
                 position: fixed !important;
-                top: 5px !important;
+                top: 8px !important;
                 right: 20px !important;
                 z-index: 999999 !important;
+                width: auto !important;
+                padding: 0 !important;
             }
             
-            /* Style the button itself to look like Lichess */
-            div[data-testid="stPopover"] button {
+            /* Style the bell button */
+            div[data-testid="column"]:has(div[data-testid="stPopover"]) button {
                 background-color: transparent !important;
                 border: none !important;
                 color: #c9c8c5 !important;
-                font-weight: bold;
+                font-weight: bold !important;
                 padding: 5px 15px !important;
                 height: 40px !important;
                 box-shadow: none !important;
             }
-            
-            div[data-testid="stPopover"] button:hover {
+            div[data-testid="column"]:has(div[data-testid="stPopover"]) button:hover {
                 color: white !important;
                 background-color: #363431 !important;
-                transform: none !important;
             }
             
-            
-            /* Blur for Popover menus and Forms */
-            div[data-testid="stPopoverBody"], div[data-testid="stForm"] {
+            /* Blur for Forms */
+            div[data-testid="stForm"] {
                 background-color: rgba(38, 36, 33, 0.75) !important;
                 backdrop-filter: blur(15px) !important;
                 border-radius: 8px !important;
                 border: 1px solid rgba(197, 160, 89, 0.3) !important;
-            }
-            
-            
-            /* Force the popover menu to appear on the right side under the button */
-            div[data-testid="stPopoverBody"] {
-                transform: none !important;
-                right: 20px !important;
-                left: auto !important;
-                top: 55px !important;
-                position: fixed !important;
             }
 
             /* Push main content down so it doesn't hide behind the navbar */
