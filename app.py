@@ -399,7 +399,7 @@ with st.sidebar:
         if st.button("Approve a Model", use_container_width=True):
             st.session_state.page = "Approve a Model"
             
-    if st.session_state.username.lower() == "abhinavk":
+    if st.session_state.role == "super_admin":
         if st.button("User Management", use_container_width=True):
             st.session_state.page = "Super Admin"
             
@@ -751,12 +751,12 @@ elif page == "Approve a Model" and st.session_state.role == "super_admin":
 # --- PAGE: SUPER ADMIN ---
 
 if page == "Super Admin":
-    if st.session_state.username.lower() != "abhinavk":
+    if st.session_state.role != "super_admin":
         st.error("Access Denied.")
         st.stop()
         
     st.title("User Management")
-    st.markdown(f"Welcome to the owner control panel, **{st.session_state.username}**.")
+    st.markdown(f"Welcome to the control panel, **{st.session_state.username}**.")
     
     users_dict = db.get_all_users()
     
@@ -769,17 +769,20 @@ if page == "Super Admin":
                 st.write(f"**User:** {app['username']}")
                 st.write(f"**Original Ban Reason:** {app['reason']}")
                 st.write(f"**Appeal Message:** {app['appeal']}")
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button(f"Approve Appeal (Unban)##{app['username']}", type="primary"):
-                        db.resolve_ban_appeal(app['username'], unban=True)
-                        st.toast(f"{app['username']} has been unbanned.")
-                        st.rerun()
-                with col2:
-                    if st.button(f"Reject Appeal##{app['username']}"):
-                        db.resolve_ban_appeal(app['username'], unban=False)
-                        st.toast(f"Appeal from {app['username']} rejected.")
-                        st.rerun()
+                if st.session_state.username.lower() == "abhinavk":
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if st.button(f"Approve Appeal (Unban)##{app['username']}", type="primary"):
+                            db.resolve_ban_appeal(app['username'], unban=True)
+                            st.toast(f"{app['username']} has been unbanned.")
+                            st.rerun()
+                    with col2:
+                        if st.button(f"Reject Appeal##{app['username']}"):
+                            db.resolve_ban_appeal(app['username'], unban=False)
+                            st.toast(f"Appeal from {app['username']} rejected.")
+                            st.rerun()
+                else:
+                    st.info("Only the owner can approve or reject ban appeals.")
         st.markdown("---")
     
     # 2. User Selection
@@ -799,43 +802,46 @@ if page == "Super Admin":
                 tab1, tab2, tab3 = st.tabs(["Role Management", "Ban History", "Feedback Submitted"])
                 
                 with tab1:
-                    st.subheader("Manage Role")
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        if u_role == "viewer":
-                            if st.button("Promote to Admin", use_container_width=True):
-                                db.set_user_role(selected_user, "admin")
-                                st.rerun()
-                        elif u_role == "admin":
-                            if st.button("Promote to Super Admin", use_container_width=True):
-                                db.set_user_role(selected_user, "super_admin")
-                                st.rerun()
-                        elif u_role == "super_admin":
-                            if st.button("Demote to Admin", use_container_width=True):
-                                db.set_user_role(selected_user, "admin")
-                                st.rerun()
-                    with col2:
-                        if u_role == "admin":
-                            if st.button("Demote to Viewer", use_container_width=True):
-                                db.set_user_role(selected_user, "viewer")
-                                st.rerun()
-                    
-                    st.markdown("---")
-                    st.subheader("Ban User")
-                    if u_role == "banned":
-                        if st.button("Unban User", type="primary"):
-                            db.resolve_ban_appeal(selected_user, unban=True)
-                            st.rerun()
-                    else:
-                        with st.form("ban_form"):
-                            ban_reason = st.text_area("Reason for banning:")
-                            if st.form_submit_button("Ban User", type="primary"):
-                                if ban_reason.strip():
-                                    db.ban_user_with_reason(selected_user, ban_reason.strip())
-                                    st.success(f"{selected_user} has been banned.")
+                    if st.session_state.username.lower() == "abhinavk":
+                        st.subheader("Manage Role")
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            if u_role == "viewer":
+                                if st.button("Promote to Admin", use_container_width=True):
+                                    db.set_user_role(selected_user, "admin")
                                     st.rerun()
-                                else:
-                                    st.error("You must provide a reason for the ban.")
+                            elif u_role == "admin":
+                                if st.button("Promote to Super Admin", use_container_width=True):
+                                    db.set_user_role(selected_user, "super_admin")
+                                    st.rerun()
+                            elif u_role == "super_admin":
+                                if st.button("Demote to Admin", use_container_width=True):
+                                    db.set_user_role(selected_user, "admin")
+                                    st.rerun()
+                        with col2:
+                            if u_role == "admin":
+                                if st.button("Demote to Viewer", use_container_width=True):
+                                    db.set_user_role(selected_user, "viewer")
+                                    st.rerun()
+                        
+                        st.markdown("---")
+                        st.subheader("Ban User")
+                        if u_role == "banned":
+                            if st.button("Unban User", type="primary"):
+                                db.resolve_ban_appeal(selected_user, unban=True)
+                                st.rerun()
+                        else:
+                            with st.form("ban_form"):
+                                ban_reason = st.text_area("Reason for banning:")
+                                if st.form_submit_button("Ban User", type="primary"):
+                                    if ban_reason.strip():
+                                        db.ban_user_with_reason(selected_user, ban_reason.strip())
+                                        st.success(f"{selected_user} has been banned.")
+                                        st.rerun()
+                                    else:
+                                        st.error("You must provide a reason for the ban.")
+                    else:
+                        st.info("You do not have permission to change roles or ban users. Only the Owner can perform these actions.")
                 
                 with tab2:
                     st.subheader("Ban History")
@@ -867,82 +873,4 @@ if page == "Super Admin":
                                         db.delete_feedback(fb.get("id"))
                                         st.rerun()
 
-
-if page == "Super Admin":
-    if st.session_state.username.lower() != "abhinavk":
-        st.error("Access Denied.")
-        st.stop()
-        
-    st.title("User Management")
-    st.markdown(f"Welcome to the owner control panel, **{st.session_state.username}**.")
-    users_dict = db.get_all_users()
-    
-    # Show Feedback
-    st.markdown("---")
-    st.subheader("User Feedback")
-    all_feedback = db.get_all_feedback()
-    if not all_feedback:
-        st.info("No feedback has been submitted yet.")
-    else:
-        for fb in reversed(all_feedback):
-            with st.container(border=True):
-                fcol1, fcol2 = st.columns([9, 1])
-                with fcol1:
-                    st.markdown(f"**From:** {fb['username']} | **Date:** {fb['date']}")
-                    st.write(fb['text'])
-                with fcol2:
-                    if st.session_state.role == "super_admin":
-                        if st.button("🗑️", key=f"del_fb_{fb.get('id')}", help="Delete this feedback"):
-                            db.delete_feedback(fb.get("id"))
-                            st.rerun()
-
-
-    st.markdown("---")
-    st.subheader("User Roles")
-    if not users_dict:
-        st.info("No users have logged in yet.")
-    else:
-        for u_name, u_role in users_dict.items():
-            if u_name.lower() == "abhinavk": continue # Cannot change super admin
-            
-            with st.container():
-                ucol1, ucol2, ucol3, ucol4 = st.columns([2, 1, 1, 1])
-                with ucol1:
-                    st.write(f"**{u_name}** ({u_role.upper()})")
-                
-                with ucol2:
-                    if u_role == "viewer":
-                        if st.button("Promote (Admin)", key=f"promo_{u_name}"):
-                            db.set_user_role(u_name, "admin")
-                            st.rerun()
-                    elif u_role == "admin":
-                        if st.button("Promote (Super)", key=f"promo_sa_{u_name}"):
-                            db.set_user_role(u_name, "super_admin")
-                            st.rerun()
-                    else:
-                        st.write("")
-                
-                with ucol3:
-                    if u_role == "banned":
-                        if st.button("Unban", key=f"unban_{u_name}"):
-                            db.set_user_role(u_name, "viewer")
-                            st.rerun()
-                    elif u_role == "super_admin":
-                        if st.button("Demote (Admin)", key=f"demo_a_{u_name}"):
-                            db.set_user_role(u_name, "admin")
-                            st.rerun()
-                    elif u_role == "admin":
-                        if st.button("Demote (Viewer)", key=f"demo_v_{u_name}"):
-                            db.set_user_role(u_name, "viewer")
-                            st.rerun()
-                    else:
-                        st.write("")
-                
-                with ucol4:
-                    if u_role != "banned":
-                        if st.button("Ban", type="primary", key=f"ban_{u_name}"):
-                            db.set_user_role(u_name, "banned")
-                            st.rerun()
-                            
-                st.markdown("---")
 
