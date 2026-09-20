@@ -93,7 +93,7 @@ def load_models():
     else:
         return _load_local()
 
-def add_model(title, description, uploaded_file):
+def add_model(title, description, uploaded_file, uploader=""):
     model_id = uuid.uuid4().hex
     
     if USE_FIREBASE:
@@ -104,7 +104,8 @@ def add_model(title, description, uploaded_file):
             "id": model_id,
             "title": title,
             "description": description,
-            "image_url": image_b64, # Saving base64 string directly to Firestore
+            "image_url": image_b64,
+            "uploader": uploader,
             "created_at": firestore.SERVER_TIMESTAMP
         })
     else:
@@ -115,6 +116,7 @@ def add_model(title, description, uploaded_file):
             "title": title,
             "description": description,
             "image_url": image_b64,
+            "uploader": uploader,
             "created_at": str(datetime.datetime.now())
         })
         _save_local(models)

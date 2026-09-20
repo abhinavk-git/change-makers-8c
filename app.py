@@ -220,10 +220,34 @@ page = st.session_state.page
 if page == "My Profile":
     st.title("My Profile")
     st.markdown(f"**Username:** {st.session_state.username}")
-    st.info("In the future, you will be able to see all the models you've added right here!")
+    
+    # Calculate donated models
+    models = db.load_models()
+    my_models = [m for m in models if m.get("uploader") == st.session_state.username]
+    
+    if st.session_state.role == "viewer":
+        st.metric("Models Donated", len(my_models))
+    else:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Models Donated", len(my_models))
+        with col2:
+            st.metric("Models Asked For Reference", 0)
+
     
     st.markdown("---")
-    if st.button("Logout"):
+    st.subheader("Preferences")
+    theme_choice = st.radio("App Theme", ["Light", "Dark"], horizontal=True)
+    if theme_choice == "Dark":
+        st.markdown("""
+        <style>
+            html { filter: invert(1) hue-rotate(180deg); }
+            img, video, iframe, [data-testid="stImage"] { filter: invert(1) hue-rotate(180deg); }
+        </style>
+        """, unsafe_allow_html=True)
+        
+    st.markdown("---")
+    if st.button("Logout", type="primary"):
         st.session_state.logged_in = False
         st.session_state.username = ""
         st.session_state.role = "viewer"
@@ -246,7 +270,7 @@ elif page == "Add a Model":
         if submitted:
             if title:
                 with st.spinner("Uploading..."):
-                    db.add_model(title, desc, img)
+                    db.add_model(title, desc, img, uploader=st.session_state.username)
                 st.success("Model added successfully! Switch to the Dashboard to see it.")
             else:
                 st.error("Please provide at least a name for the model.")
