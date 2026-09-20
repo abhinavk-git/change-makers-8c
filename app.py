@@ -46,11 +46,11 @@ hide_st_style = """
             }
             /* Pin the notification bell to the absolute top right */
             div[data-testid="stPopover"] {
-                margin-top: -65px !important;
-                margin-right: -10px !important;
+                display: flex;
+                justify-content: flex-end;
                 z-index: 999999 !important;
                 transform: scale(1.3);
-                transform-origin: top right;
+                transform-origin: right center;
             }
             </style>
             """
