@@ -172,9 +172,16 @@ if "role" not in st.session_state:
 # --- COOKIE MANAGER (12 HR PERSISTENT LOGIN) ---
 cookie_manager = stx.CookieManager(key="cookie_manager")
 
-# Wait for cookies to load from frontend
+# Wait for cookies to load from frontend.
+# We stop exactly ONCE (on the very first execution tick) so the cookie manager
+# can complete one round-trip with the browser. On tick 1+ we always continue,
+# regardless of whether cookies is None or {}.
+if "cookie_load_tick" not in st.session_state:
+    st.session_state.cookie_load_tick = 0
+
 cookies = cookie_manager.get_all()
-if cookies is None:
+if st.session_state.cookie_load_tick == 0:
+    st.session_state.cookie_load_tick = 1
     st.stop()
 
 
@@ -363,12 +370,13 @@ with st.sidebar:
 page = st.session_state.page
 
 # --- GLOBAL NOTIFICATION BELL ---
-# Lichess style floating chat box using JS injection for cross-browser reliability
 unread_count = db.get_unread_count(st.session_state.username)
 bell_icon = f"🔔 Notifications ({unread_count})" if unread_count > 0 else "🔔 Notifications"
 
-
-with st.popover(bell_icon):
+# Place the bell in the rightmost column so Streamlit's JS anchors the popup on the right
+_bell_spacer, _bell_col = st.columns([10, 1])
+with _bell_col:
+    with st.popover(bell_icon, use_container_width=True):
         st.subheader("Direct Messages")
         
         # Message sending
