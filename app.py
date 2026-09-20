@@ -149,15 +149,14 @@ if "role" not in st.session_state:
         st.session_state.role = "viewer"
 
 # --- COOKIE MANAGER (12 HR PERSISTENT LOGIN) ---
-cookie_manager = stx.CookieManager()
+cookie_manager = stx.CookieManager(key="cookie_manager")
 
 # Wait for cookies to load from frontend
 cookies = cookie_manager.get_all()
 if cookies is None:
     st.stop()
 
-# DEBUG: Remove in production
-st.sidebar.write("COOKIES:", cookies)
+
 
 
 stored_username = cookie_manager.get(cookie="cm_username")
