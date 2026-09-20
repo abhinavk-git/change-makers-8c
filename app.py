@@ -12,11 +12,13 @@ hide_st_style = """
             #MainMenu {visibility: hidden;}
             header {visibility: hidden;}
             footer {visibility: hidden; display: none;}
-            .stDeployButton {display:none;}
-            button[title="Collapse sidebar"] {display: none;}
-            button[title="Expand sidebar"] {display: none;}
-            [data-testid="collapsedControl"] {display: none;}
-            [data-testid="stViewerBadge"] {display: none;}
+            .stDeployButton {display:none !important;}
+            button[title="Collapse sidebar"] {display: none !important;}
+            button[title="Expand sidebar"] {display: none !important;}
+            [data-testid="collapsedControl"] {display: none !important;}
+            [data-testid="stViewerBadge"] {display: none !important;}
+            div[class^='viewerBadge'] {display: none !important;}
+            div[class*='viewerBadge'] {display: none !important;}
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
