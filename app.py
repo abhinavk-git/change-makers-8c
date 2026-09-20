@@ -92,6 +92,15 @@ hide_st_style = """<style>
                 border: 1px solid rgba(197, 160, 89, 0.3) !important;
             }
             
+            
+            /* Force the popover menu to appear on the right side under the button */
+            div[data-testid="stPopoverBody"] {
+                right: 20px !important;
+                left: auto !important;
+                top: 55px !important;
+                position: fixed !important;
+            }
+
             /* Push main content down so it doesn't hide behind the navbar */
             .block-container {
                 padding-top: 70px !important;
