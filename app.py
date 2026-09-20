@@ -2,6 +2,7 @@ import streamlit as st
 import database as db
 import extra_streamlit_components as stx
 import datetime
+from streamlit_option_menu import option_menu
 
 st.set_page_config(page_title="Change Makers 8c", page_icon="🏛️", layout="wide")
 
@@ -137,7 +138,20 @@ if not st.session_state.logged_in:
 # --- SIDEBAR NAVIGATION ---
 with st.sidebar:
     st.title("🏛️ Museum Menu")
-    page = st.radio("Navigation", ["Dashboard", "My Profile"])
+    
+    page = option_menu(
+        menu_title=None, 
+        options=["Dashboard", "My Profile"], 
+        icons=["house", "person-circle"], 
+        menu_icon="cast", 
+        default_index=0,
+        styles={
+            "container": {"padding": "0!important", "background-color": "transparent"},
+            "icon": {"color": "orange", "font-size": "18px"}, 
+            "nav-link": {"font-size": "16px", "text-align": "left", "margin":"0px"},
+            "nav-link-selected": {"background-color": "#ff4b4b"},
+        }
+    )
     
     st.divider()
     

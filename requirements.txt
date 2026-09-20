@@ -3,3 +3,4 @@ Pillow
 firebase-admin
 pyrebase4
 extra-streamlit-components
+streamlit-option-menu
