@@ -169,7 +169,7 @@ with st.sidebar:
     if st.button("My Profile", use_container_width=True):
         st.session_state.page = "My Profile"
     
-    st.markdown("<br>" * 15, unsafe_allow_html=True) # Push to bottom
+    st.markdown("<br><br>", unsafe_allow_html=True) # Small space below buttons
     
     # Profile Indicator with Circle
     first_letter = st.session_state.username[0].upper() if st.session_state.username else "?"
