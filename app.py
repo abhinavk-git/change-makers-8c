@@ -94,6 +94,11 @@ if "role" not in st.session_state:
 cookie_manager = stx.CookieManager()
 
 stored_username = cookie_manager.get(cookie="cm_username")
+
+if st.session_state.get("force_logout", False):
+    stored_username = None
+    st.session_state.force_logout = False
+
 if stored_username and not st.session_state.logged_in:
     role = db.get_user_role(stored_username)
     if role != "banned":
@@ -253,7 +258,10 @@ if page == "My Profile":
         st.session_state.username = ""
         st.session_state.role = "viewer"
         st.session_state.page = "Dashboard"
+        st.session_state.force_logout = True
         cookie_manager.delete("cm_username")
+        # Overwrite just in case
+        cookie_manager.set("cm_username", "")
         import time; time.sleep(1)
         st.rerun()
 
