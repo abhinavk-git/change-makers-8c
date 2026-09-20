@@ -596,7 +596,9 @@ elif page == "Dashboard":
                     m = models[i + j]
                     with col:
                         with st.container(border=True):
-                            st.subheader(m.get("title", "Untitled"))
+                            # Title
+                            title_text = m.get('title', 'Untitled')
+                            st.markdown(f"<h3 style='text-align: center; margin-bottom: 0;'>{title_text}</h3>", unsafe_allow_html=True)
                             
                             # Metadata tags
                             meta_parts = []
@@ -604,13 +606,14 @@ elif page == "Dashboard":
                             if m.get("grade"):   meta_parts.append(f"🎓 {m['grade']}")
                             if m.get("donor_name"): meta_parts.append(f"🎁 Donated by {m['donor_name']}")
                             if meta_parts:
-                                st.caption(" · ".join(meta_parts))
+                                meta_str = " · ".join(meta_parts)
+                                st.markdown(f"<div style='text-align: center; color: #a3a19b; font-size: 0.9em; margin-bottom: 10px;'>{meta_str}</div>", unsafe_allow_html=True)
                         
                             if m.get("image_url"):
                                 st.image(m["image_url"], use_container_width=True)
                         
                             if m.get("description"):
-                                st.write(m["description"])
+                                st.markdown(f"<div style='text-align: center; margin-top: 10px;'>{m['description']}</div>", unsafe_allow_html=True)
                             
                             # Edit / Delete Section
                             if st.session_state.role in ["admin", "super_admin"]:
