@@ -1,6 +1,6 @@
 import streamlit as st
 import database as db
-import extra_streamlit_components as stx
+from streamlit_cookies_controller import CookieController
 import datetime
 from streamlit_option_menu import option_menu
 
@@ -170,24 +170,15 @@ if "role" not in st.session_state:
         st.session_state.role = "viewer"
 
 # --- COOKIE MANAGER (12 HR PERSISTENT LOGIN) ---
-cookie_manager = stx.CookieManager(key="cookie_manager")
+cookie_manager = CookieController(key="cookie_manager")
 
-# Wait for cookies to load from frontend.
-# We stop exactly ONCE (on the very first execution tick) so the cookie manager
-# can complete one round-trip with the browser. On tick 1+ we always continue,
-# regardless of whether cookies is None or {}.
-if "cookie_load_tick" not in st.session_state:
-    st.session_state.cookie_load_tick = 0
-
-cookies = cookie_manager.get_all()
-if st.session_state.cookie_load_tick == 0:
-    st.session_state.cookie_load_tick = 1
-    st.stop()
+# streamlit-cookies-controller is synchronous on first read -- no need to st.stop()
+cookies = cookie_manager.getAll()
 
 
 
 
-stored_username = cookie_manager.get(cookie="cm_username")
+stored_username = cookie_manager.get("cm_username")
 
 if stored_username and isinstance(stored_username, str) and not st.session_state.logged_in and not st.session_state.get("ignore_cookie", False):
     role = db.get_user_role(stored_username)
@@ -240,7 +231,7 @@ if not st.session_state.logged_in:
                                 st.session_state.username = username
                                 st.session_state.role = role
                                 # Set cookie for 12 hours
-                                cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(hours=12))
+                                cookie_manager.set("cm_username", username, max_age=43200)
                         except Exception as e:
                             try:
                                 import json
@@ -310,7 +301,7 @@ if not st.session_state.logged_in:
                             st.session_state.logged_in = True
                             st.session_state.username = username.strip()
                             st.session_state.role = role
-                            cookie_manager.set("cm_username", username.strip(), expires_at=datetime.datetime.now() + datetime.timedelta(hours=12))
+                            cookie_manager.set("cm_username", username.strip(), max_age=43200)
                     else:
                         st.error("Incorrect username or password.")
                         
@@ -541,8 +532,7 @@ elif page == "My Profile":
         st.session_state.role = "viewer"
         st.session_state.page = "Dashboard"
         st.session_state.ignore_cookie = True
-        cookie_manager.delete("cm_username")
-        cookie_manager.set("cm_username", "")
+        cookie_manager.remove("cm_username")
         st.rerun()
 
 # --- PAGE: ADD A MODEL ---
