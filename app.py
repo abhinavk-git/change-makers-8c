@@ -112,6 +112,10 @@ if "role" not in st.session_state:
 # --- COOKIE MANAGER (24 HR PERSISTENT LOGIN) ---
 cookie_manager = stx.CookieManager()
 
+# Wait for cookies to load from frontend
+if cookie_manager.get_all() is None:
+    st.stop()
+
 stored_username = cookie_manager.get(cookie="cm_username")
 
 if stored_username and isinstance(stored_username, str) and not st.session_state.logged_in and not st.session_state.get("ignore_cookie", False):
