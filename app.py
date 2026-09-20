@@ -331,7 +331,7 @@ elif page == "Dashboard":
     st.markdown(f"""
     <div style="border-bottom: 4px solid #ff4b4b; margin-bottom: 30px; padding-bottom: 10px;">
         <h1 style="font-size: 2.5rem; margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Hi {st.session_state.username}</h1>
-        <p style="font-size: 1.1rem; opacity: 0.7; text-transform: uppercase; font-weight: bold; margin-top: 5px;">Welcome to the curated model museum</p>
+        <p style="font-size: 1.1rem; opacity: 0.7; text-transform: uppercase; font-weight: bold; margin-top: 5px;">Welcome to the Model Museum</p>
     </div>
     """, unsafe_allow_html=True)
 
