@@ -171,15 +171,10 @@ with st.sidebar:
     
     st.markdown("<br>" * 15, unsafe_allow_html=True) # Push to bottom
     
-    if st.button("Logout", use_container_width=True):
-        st.session_state.page = "Logout"
-        
-    st.divider()
-    
-    # Profile Indicator with Circle (Bottom-most)
+    # Profile Indicator with Circle
     first_letter = st.session_state.username[0].upper() if st.session_state.username else "?"
     profile_html = f"""
-    <div style="display: flex; align-items: center; margin-bottom: 5px;">
+    <div style="display: flex; align-items: center; margin-bottom: 15px;">
         <div style="background-color: #ff4b4b; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-weight: bold; margin-right: 15px; font-size: 20px;">
             {first_letter}
         </div>
@@ -189,6 +184,11 @@ with st.sidebar:
     </div>
     """
     st.markdown(profile_html, unsafe_allow_html=True)
+    
+    st.divider()
+    
+    if st.button("Logout", use_container_width=True):
+        st.session_state.page = "Logout"
 
 page = st.session_state.page
 
