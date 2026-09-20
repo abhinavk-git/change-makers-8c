@@ -141,8 +141,8 @@ with st.sidebar:
     
     page = option_menu(
         menu_title=None, 
-        options=["Dashboard", "My Profile"], 
-        icons=["house", "person-circle"], 
+        options=["Dashboard", "Add a Model", "My Profile", "Logout"], 
+        icons=["house", "plus-square", "person-circle", "box-arrow-right"], 
         menu_icon="cast", 
         default_index=0,
         styles={
@@ -154,48 +154,50 @@ with st.sidebar:
     )
     
     st.divider()
-    
     st.markdown(f"**Logged in as:** {st.session_state.username}")
-    if st.button("Logout"):
-        st.session_state.logged_in = False
-        st.session_state.username = ""
-        cookie_manager.delete("cm_username")
-        st.rerun()
+
+# --- ACTION: LOGOUT ---
+if page == "Logout":
+    st.session_state.logged_in = False
+    st.session_state.username = ""
+    cookie_manager.delete("cm_username")
+    st.rerun()
 
 # --- PAGE: MY PROFILE ---
-if page == "My Profile":
+elif page == "My Profile":
     st.title("👤 My Profile")
     st.markdown(f"**Username:** {st.session_state.username}")
     st.info("In the future, you will be able to see all the models you've added right here!")
+
+# --- PAGE: ADD A MODEL ---
+elif page == "Add a Model":
+    st.title("➕ Add a New Model")
+    st.markdown("Fill out the details below to add a new model to the museum.")
+    
+    with st.form("add_model_form", clear_on_submit=True):
+        title = st.text_input("Model Name", max_chars=100)
+        desc = st.text_area("Description")
+        img = st.file_uploader("Upload Image (Optional)", type=["jpg", "jpeg", "png", "webp"])
+        
+        submitted = st.form_submit_button("Add Model")
+        if submitted:
+            if title:
+                with st.spinner("Uploading..."):
+                    db.add_model(title, desc, img)
+                st.success("Model added successfully! Switch to the Dashboard to see it.")
+            else:
+                st.error("Please provide at least a name for the model.")
     
 # --- PAGE: DASHBOARD ---
 elif page == "Dashboard":
     st.title("🏛️ Change Makers Model Museum")
-    st.markdown("Welcome to the Model Museum! Explore our models or add your own.")
-
-    # --- ADD NEW MODEL (Inside an Expander) ---
-    with st.expander("➕ Add New Model", expanded=False):
-        with st.form("add_model_form", clear_on_submit=True):
-            title = st.text_input("Model Name", max_chars=100)
-            desc = st.text_area("Description")
-            img = st.file_uploader("Upload Image (Optional)", type=["jpg", "jpeg", "png", "webp"])
-            
-            submitted = st.form_submit_button("Add Model")
-            if submitted:
-                # Made image NOT mandatory
-                if title:
-                    with st.spinner("Uploading..."):
-                        db.add_model(title, desc, img)
-                    st.success("Model added successfully!")
-                    st.rerun()
-                else:
-                    st.error("Please provide at least a name for the model.")
+    st.markdown("Welcome to the Model Museum! Explore our models below.")
 
     # --- MAIN CONTENT: GALLERY ---
     models = db.load_models()
 
     if not models:
-        st.info("The museum is currently empty. Be the first to add a model!")
+        st.info("The museum is currently empty. Go to 'Add a Model' in the sidebar to be the first!")
     else:
         cols_per_row = 3
         for i in range(0, len(models), cols_per_row):
