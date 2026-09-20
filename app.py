@@ -255,21 +255,21 @@ elif page == "Dashboard":
                         if st.session_state.role in ["admin", "super_admin"]:
                             with st.expander("Edit / Delete"):
                                 with st.form(f"edit_form_{m['id']}"):
-                                edit_title = st.text_input("Name", value=m.get("title", ""))
-                                edit_desc = st.text_area("Description", value=m.get("description", ""))
-                                edit_img = st.file_uploader("New Image (optional)", type=["jpg", "jpeg", "png", "webp"])
-                                
-                                col1, col2 = st.columns(2)
-                                with col1:
-                                    if st.form_submit_button("Update"):
-                                        with st.spinner("Updating..."):
-                                            db.update_model(m["id"], edit_title, edit_desc, edit_img)
-                                        st.success("Updated!")
-                                        st.rerun()
-                                with col2:
-                                    if st.form_submit_button("Delete ❌"):
-                                        db.delete_model(m["id"])
-                                        st.rerun()
+                                    edit_title = st.text_input("Name", value=m.get("title", ""))
+                                    edit_desc = st.text_area("Description", value=m.get("description", ""))
+                                    edit_img = st.file_uploader("New Image (optional)", type=["jpg", "jpeg", "png", "webp"])
+                                    
+                                    col1, col2 = st.columns(2)
+                                    with col1:
+                                        if st.form_submit_button("Update"):
+                                            with st.spinner("Updating..."):
+                                                db.update_model(m["id"], edit_title, edit_desc, edit_img)
+                                            st.success("Updated!")
+                                            st.rerun()
+                                    with col2:
+                                        if st.form_submit_button("Delete ❌"):
+                                            db.delete_model(m["id"])
+                                            st.rerun()
 
 # --- PAGE: SUPER ADMIN ---
 if page == "Super Admin":
