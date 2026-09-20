@@ -798,8 +798,16 @@ if page == "Super Admin":
     else:
         for fb in reversed(all_feedback):
             with st.container(border=True):
-                st.markdown(f"**From:** {fb['username']} | **Date:** {fb['date']}")
-                st.write(fb['text'])
+                fcol1, fcol2 = st.columns([9, 1])
+                with fcol1:
+                    st.markdown(f"**From:** {fb['username']} | **Date:** {fb['date']}")
+                    st.write(fb['text'])
+                with fcol2:
+                    if st.session_state.role in ["admin", "super_admin"]:
+                        if st.button("🗑️", key=f"del_fb_{fb.get('id')}", help="Delete this feedback"):
+                            db.delete_feedback(fb.get("id"))
+                            st.rerun()
+
 
     st.markdown("---")
     st.subheader("User Roles")
