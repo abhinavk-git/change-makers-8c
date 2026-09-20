@@ -208,3 +208,24 @@ def get_all_users():
         return {doc.id: doc.to_dict().get("role", "viewer") for doc in users_ref}
     else:
         return _load_users_local()
+
+# --- FEEDBACK ---
+FEEDBACK_FILE = "feedback.json"
+
+def get_all_feedback():
+    if not os.path.exists(FEEDBACK_FILE): return []
+    try:
+        with open(FEEDBACK_FILE, "r") as f: return json.load(f)
+    except: return []
+
+def save_feedback(username, text):
+    feedback = get_all_feedback()
+    import datetime
+    entry = {
+        "id": str(int(datetime.datetime.now().timestamp() * 1000)),
+        "username": username,
+        "text": text,
+        "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    }
+    feedback.append(entry)
+    with open(FEEDBACK_FILE, "w") as f: json.dump(feedback, f, indent=4)

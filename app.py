@@ -280,7 +280,8 @@ elif page == "Feedback":
         feedback_text = st.text_area("Your Feedback")
         if st.form_submit_button("Submit"):
             if feedback_text.strip():
-                st.success("Thank you for your feedback! We appreciate it.")
+                db.save_feedback(st.session_state.username, feedback_text.strip())
+                st.success("Thank you for your feedback! It has been sent directly to the owner.")
             else:
                 st.error("Please enter some feedback before submitting.")
 
@@ -473,6 +474,20 @@ if page == "Super Admin":
     st.markdown(f"Welcome to the owner control panel, **{st.session_state.username}**.")
     users_dict = db.get_all_users()
     
+    # Show Feedback
+    st.markdown("---")
+    st.subheader("User Feedback")
+    all_feedback = db.get_all_feedback()
+    if not all_feedback:
+        st.info("No feedback has been submitted yet.")
+    else:
+        for fb in reversed(all_feedback):
+            with st.container(border=True):
+                st.markdown(f"**From:** {fb['username']} | **Date:** {fb['date']}")
+                st.write(fb['text'])
+
+    st.markdown("---")
+    st.subheader("User Roles")
     if not users_dict:
         st.info("No users have logged in yet.")
     else:
