@@ -4,7 +4,7 @@ import extra_streamlit_components as stx
 import datetime
 from streamlit_option_menu import option_menu
 
-st.set_page_config(page_title="Change Makers 8c", page_icon="🏛️", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Change Makers 8c", page_icon="", layout="wide", initial_sidebar_state="expanded")
 
 # --- HIDE STREAMLIT BRANDING & MENU ---
 hide_st_style = """
@@ -97,7 +97,7 @@ if not st.session_state.logged_in:
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        st.title("🔒 Login Required")
+        st.title("Login Required")
         st.markdown("Please log in or create an account to access the Model Museum.")
         
         if USE_FIREBASE_AUTH:
@@ -134,12 +134,12 @@ if not st.session_state.logged_in:
                             st.error("Username might already be taken, or password is too short.")
         else:
             if firebase_setup_error:
-                st.error(f"⚠️ Firebase Error: {firebase_setup_error}")
+                st.error(f" Firebase Error: {firebase_setup_error}")
                 
             if not secrets_exist:
-                st.error("⚠️ No secrets file found. If you are running locally, create `.streamlit/secrets.toml`")
+                st.error("No secrets file found. If you are running locally, create `.streamlit/secrets.toml`")
             elif "firebase_api_key" not in st.secrets or "firebase_project_id" not in st.secrets:
-                st.error("⚠️ Missing `firebase_api_key` or `firebase_project_id` in secrets.")
+                st.error("Missing `firebase_api_key` or `firebase_project_id` in secrets.")
                 
             st.warning("Firebase Authentication is not configured yet. Falling back to simple admin password.")
             
@@ -154,7 +154,7 @@ if not st.session_state.logged_in:
                     if password == correct_password and len(username.strip()) > 0:
                         role = db.get_user_role(username.strip())
                         if role == "banned":
-                            st.error("🚫 This account has been banned by an administrator.")
+                            st.error("This account has been banned by an administrator.")
                         else:
                             st.session_state.logged_in = True
                             st.session_state.username = username.strip()
@@ -206,13 +206,13 @@ page = st.session_state.page
 
 # --- PAGE: MY PROFILE ---
 if page == "My Profile":
-    st.title("👤 My Profile")
+    st.title("My Profile")
     st.markdown(f"**Username:** {st.session_state.username}")
     st.info("In the future, you will be able to see all the models you've added right here!")
 
 # --- PAGE: ADD A MODEL ---
 elif page == "Add a Model":
-    st.title("➕ Add a New Model")
+    st.title("Add a New Model")
     st.markdown("Fill out the details below to add a new model to the museum.")
     
     with st.form("add_model_form", clear_on_submit=True):
@@ -271,17 +271,17 @@ elif page == "Dashboard":
                                             st.success("Updated!")
                                             st.rerun()
                                     with col2:
-                                        if st.form_submit_button("Delete ❌"):
+                                        if st.form_submit_button("Delete"):
                                             db.delete_model(m["id"])
                                             st.rerun()
 
 # --- PAGE: SUPER ADMIN ---
 if page == "Super Admin":
     if st.session_state.username.lower() != "abhinavk":
-        st.error("🚫 Access Denied.")
+        st.error("Access Denied.")
         st.stop()
         
-    st.title("👑 Super Admin Panel")
+    st.title("Super Admin Panel")
     st.markdown(f"Welcome to the master control panel, **{st.session_state.username}**.")
     
     
@@ -301,25 +301,25 @@ if page == "Super Admin":
                 
                 with ucol2:
                     if u_role == "banned":
-                        st.write(" ") # empty
+                        st.write("") # empty
                     elif u_role != "admin":
-                        if st.button("Promote ⬆️", key=f"promo_{u_name}"):
+                        if st.button("Promote", key=f"promo_{u_name}"):
                             db.set_user_role(u_name, "admin")
                             st.rerun()
                 
                 with ucol3:
                     if u_role == "banned":
-                        if st.button("Unban 🟢", key=f"unban_{u_name}"):
+                        if st.button("Unban", key=f"unban_{u_name}"):
                             db.set_user_role(u_name, "viewer")
                             st.rerun()
                     elif u_role != "viewer":
-                        if st.button("Demote ⬇️", key=f"demo_{u_name}"):
+                        if st.button("Demote", key=f"demo_{u_name}"):
                             db.set_user_role(u_name, "viewer")
                             st.rerun()
                 
                 with ucol4:
                     if u_role != "banned":
-                        if st.button("Ban 🚫", type="primary", key=f"ban_{u_name}"):
+                        if st.button("Ban", type="primary", key=f"ban_{u_name}"):
                             db.set_user_role(u_name, "banned")
                             st.rerun()
                             
