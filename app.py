@@ -284,8 +284,18 @@ elif page == "Feedback":
         feedback_text = st.text_area("Your Feedback")
         if st.form_submit_button("Submit"):
             if feedback_text.strip():
-                db.save_feedback(st.session_state.username, feedback_text.strip())
-                st.success("Thank you for your feedback! It has been sent directly to the owner.")
+                import datetime
+                today_str = datetime.datetime.now().strftime("%Y-%m-%d")
+                
+                # Check how many feedback they submitted today
+                all_fb = db.get_all_feedback()
+                todays_fb_count = sum(1 for fb in all_fb if fb.get("username") == st.session_state.username and fb.get("date", "").startswith(today_str))
+                
+                if todays_fb_count >= 5:
+                    st.error("You have reached the limit of 5 feedback submissions per day. Please come back tomorrow!")
+                else:
+                    db.save_feedback(st.session_state.username, feedback_text.strip())
+                    st.success("Thank you for your feedback! It has been sent directly to the owner.")
             else:
                 st.error("Please enter some feedback before submitting.")
 
@@ -327,6 +337,38 @@ elif page == "My Profile":
     
     st.markdown("---")
     st.subheader("Preferences")
+    
+    if USE_FIREBASE_AUTH:
+        with st.expander("Change Password"):
+            with st.form("change_password_form", clear_on_submit=True):
+                current_pw = st.text_input("Current Password", type="password")
+                new_pw = st.text_input("New Password", type="password")
+                
+                if st.form_submit_button("Update Password"):
+                    if not current_pw or not new_pw:
+                        st.error("Please fill in both fields.")
+                    elif len(new_pw) < 6:
+                        st.error("New password must be at least 6 characters.")
+                    else:
+                        fake_email = f"{st.session_state.username.lower().replace(' ', '')}@changemakers.local"
+                        try:
+                            # Re-authenticate to get a fresh token
+                            user = auth.sign_in_with_email_and_password(fake_email, current_pw)
+                            # Change the password using the token
+                            auth.change_password(user['idToken'], new_pw)
+                            st.success("Password successfully updated!")
+                        except Exception as e:
+                            try:
+                                import json
+                                error_data = json.loads(e.args[1])
+                                err_msg = error_data['error']['message']
+                                if err_msg == "INVALID_LOGIN_CREDENTIALS" or err_msg == "INVALID_PASSWORD":
+                                    st.error("Incorrect current password.")
+                                else:
+                                    st.error(f"Error: {err_msg}")
+                            except:
+                                st.error("Incorrect current password or an error occurred.")
+
     
     # Map index from session state
     theme_idx = 0 if st.session_state.theme == "Dark" else 1
