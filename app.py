@@ -42,7 +42,7 @@ hide_st_style = """
                 flex-grow: 1;
             }
             div.stButton > button {
-                border-radius: 0px !important;
+                border-radius: 3px !important;
             }
             
             /* Lichess style Top Navbar background */
@@ -54,7 +54,7 @@ hide_st_style = """
                 right: 0;
                 height: 50px;
                 background-color: #262421;
-                border-bottom: 2px solid #ff4b4b;
+                border-bottom: 2px solid #C5A059;
                 z-index: 999998;
             }
             
@@ -319,7 +319,7 @@ with st.sidebar:
     first_letter = st.session_state.username[0].upper() if st.session_state.username else "?"
     profile_html = f"""
     <div style="display: flex; align-items: center; margin-bottom: 5px;">
-        <div style="background-color: #ff4b4b; color: white; border-radius: 4px; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-weight: bold; margin-right: 15px; font-size: 20px;">
+        <div style="background-color: #C5A059; color: white; border-radius: 4px; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-weight: bold; margin-right: 15px; font-size: 20px;">
             {first_letter}
         </div>
         <div style="font-size: 18px; font-weight: bold;">
@@ -381,7 +381,7 @@ with st.popover(bell_icon):
 # --- PAGE: ABOUT US ---
 if page == "About Us":
     st.markdown("""
-    <div style="border-bottom: 4px solid #ff4b4b; margin-bottom: 30px; padding-bottom: 10px;">
+    <div style="border-bottom: 2px solid #C5A059; margin-bottom: 30px; padding-bottom: 10px;">
         <h1 style="font-size: 2.5rem; margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">About Us</h1>
     </div>
     """, unsafe_allow_html=True)
@@ -396,7 +396,7 @@ if page == "About Us":
 # --- PAGE: FEEDBACK ---
 elif page == "Feedback":
     st.markdown("""
-    <div style="border-bottom: 4px solid #ff4b4b; margin-bottom: 30px; padding-bottom: 10px;">
+    <div style="border-bottom: 2px solid #C5A059; margin-bottom: 30px; padding-bottom: 10px;">
         <h1 style="font-size: 2.5rem; margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Feedback</h1>
     </div>
     """, unsafe_allow_html=True)
@@ -435,7 +435,7 @@ elif page == "My Profile":
     st.markdown(f"""
     <div style="margin-top: 15px; margin-bottom: 25px;">
         <span style="font-size: 1.1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Current Position</span><br>
-        <div style="display: inline-block; background-color: #ff4b4b; color: white; padding: 8px 18px; font-weight: 900; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 8px; border: 2px solid var(--text-color); box-shadow: 4px 4px 0px var(--text-color);">
+        <div style="display: inline-block; background-color: transparent; color: #C5A059; padding: 8px 18px; font-weight: 900; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 8px; border: 1px solid #C5A059; box-shadow: 0px 4px 15px rgba(197, 160, 89, 0.2); border-radius: 3px;">
             {display_role}
         </div>
     </div>
@@ -540,20 +540,22 @@ elif page == "Dashboard":
     st.markdown("""
     <style>
     [data-testid="stVerticalBlockBorderWrapper"] {
-        border: 2px solid var(--text-color) !important;
-        border-radius: 0px !important;
-        box-shadow: 5px 5px 0px #ff4b4b !important;
-        transition: all 0.2s ease;
+        border: 1px solid rgba(197, 160, 89, 0.3) !important;
+        border-radius: 4px !important;
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5) !important;
+        background: linear-gradient(145deg, #262421 0%, #1A1A1A 100%) !important;
+        transition: all 0.3s ease;
     }
     [data-testid="stVerticalBlockBorderWrapper"]:hover {
-        transform: translate(-3px, -3px);
-        box-shadow: 8px 8px 0px #ff4b4b !important;
+        transform: translateY(-5px);
+        box-shadow: 0px 8px 25px rgba(197, 160, 89, 0.15) !important;
+        border: 1px solid #C5A059 !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
     st.markdown(f"""
-    <div style="border-bottom: 4px solid #ff4b4b; margin-bottom: 30px; padding-bottom: 10px;">
+    <div style="border-bottom: 2px solid #C5A059; margin-bottom: 30px; padding-bottom: 10px;">
         <h1 style="font-size: 2.5rem; margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Hi {st.session_state.username}</h1>
         <p style="font-size: 1.1rem; opacity: 0.7; text-transform: uppercase; font-weight: bold; margin-top: 5px;">Welcome to the Model Museum</p>
     </div>
