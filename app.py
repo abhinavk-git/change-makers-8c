@@ -134,12 +134,16 @@ if not st.session_state.logged_in:
                         fake_email = f"{username.lower().replace(' ', '')}@changemakers.local"
                         try:
                             user = auth.sign_in_with_email_and_password(fake_email, password)
-                            st.session_state.ignore_cookie = False
-                            st.session_state.logged_in = True
-                            st.session_state.username = username
-                            st.session_state.role = db.get_user_role(username)
-                            # Set cookie for 24 hours
-                            cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
+                            role = db.get_user_role(username)
+                            if role == "banned":
+                                st.error("This account has been banned from the museum.")
+                            else:
+                                st.session_state.ignore_cookie = False
+                                st.session_state.logged_in = True
+                                st.session_state.username = username
+                                st.session_state.role = role
+                                # Set cookie for 24 hours
+                                cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
                         except Exception as e:
                             try:
                                 import json
