@@ -4,7 +4,7 @@ import extra_streamlit_components as stx
 import datetime
 from streamlit_option_menu import option_menu
 
-st.set_page_config(page_title="Change Makers 8c", page_icon="🏛️", layout="wide")
+st.set_page_config(page_title="Change Makers 8c", page_icon="🏛️", layout="wide", initial_sidebar_state="expanded")
 
 # --- HIDE STREAMLIT BRANDING & MENU ---
 hide_st_style = """
@@ -13,6 +13,7 @@ hide_st_style = """
             header {visibility: hidden;}
             footer {visibility: hidden;}
             .stDeployButton {display:none;}
+            [data-testid="collapsedControl"] {display: none;}
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
