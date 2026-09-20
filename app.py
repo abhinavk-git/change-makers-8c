@@ -152,8 +152,13 @@ if "role" not in st.session_state:
 cookie_manager = stx.CookieManager()
 
 # Wait for cookies to load from frontend
-if cookie_manager.get_all() is None:
+cookies = cookie_manager.get_all()
+if cookies is None:
     st.stop()
+
+# DEBUG: Remove in production
+st.sidebar.write("COOKIES:", cookies)
+
 
 stored_username = cookie_manager.get(cookie="cm_username")
 
