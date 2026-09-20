@@ -371,14 +371,16 @@ with _bell_col:
                 
         # Message list
         msgs = db.get_messages_for_user(st.session_state.username)
-        if not msgs:
+        # Only show messages received by me, not ones I sent
+        received = [m for m in msgs if m["recipient"] == st.session_state.username]
+        if not received:
             st.info("No messages.")
         else:
-            for m in reversed(msgs[-20:]): # Only show last 20 messages
+            for m in reversed(received[-20:]):
                 with st.container(border=True):
-                    is_unread = not m["read"] and m["recipient"] == st.session_state.username
+                    is_unread = not m["read"]
                     dot = "🔵 " if is_unread else ""
-                    st.markdown(f"{dot}**From:** {m['sender']} | **To:** {m['recipient']}")
+                    st.markdown(f"{dot}**From:** {m['sender']}")
                     st.caption(m['timestamp'])
                     st.write(m['text'])
 
