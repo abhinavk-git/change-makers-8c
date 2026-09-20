@@ -44,6 +44,13 @@ hide_st_style = """
             div.stButton > button {
                 border-radius: 0px !important;
             }
+            /* Pin the notification bell to the absolute top right */
+            div[data-testid="stPopover"] {
+                position: fixed !important;
+                top: 15px !important;
+                right: 25px !important;
+                z-index: 999999 !important;
+            }
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
