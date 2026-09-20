@@ -22,6 +22,9 @@ hide_st_style = """
             [data-testid="stViewerBadge"] {display: none !important;}
             div[class^='viewerBadge'] {display: none !important;}
             div[class*='viewerBadge'] {display: none !important;}
+            div.stButton > button {
+                border-radius: 0px !important;
+            }
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
@@ -189,7 +192,7 @@ with st.sidebar:
     first_letter = st.session_state.username[0].upper() if st.session_state.username else "?"
     profile_html = f"""
     <div style="display: flex; align-items: center; margin-bottom: 5px;">
-        <div style="background-color: #ff4b4b; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-weight: bold; margin-right: 15px; font-size: 20px;">
+        <div style="background-color: #ff4b4b; color: white; border-radius: 4px; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; font-weight: bold; margin-right: 15px; font-size: 20px;">
             {first_letter}
         </div>
         <div style="font-size: 18px; font-weight: bold;">
