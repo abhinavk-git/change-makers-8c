@@ -95,11 +95,7 @@ cookie_manager = stx.CookieManager()
 
 stored_username = cookie_manager.get(cookie="cm_username")
 
-if st.session_state.get("force_logout", False):
-    stored_username = None
-    st.session_state.force_logout = False
-
-if stored_username and not st.session_state.logged_in:
+if stored_username and not st.session_state.logged_in and not st.session_state.get("ignore_cookie", False):
     role = db.get_user_role(stored_username)
     if role != "banned":
         st.session_state.logged_in = True
@@ -126,6 +122,7 @@ if not st.session_state.logged_in:
                         fake_email = f"{username.lower().replace(' ', '')}@changemakers.local"
                         try:
                             user = auth.sign_in_with_email_and_password(fake_email, password)
+                            st.session_state.ignore_cookie = False
                             st.session_state.logged_in = True
                             st.session_state.username = username
                             st.session_state.role = db.get_user_role(username)
@@ -171,6 +168,7 @@ if not st.session_state.logged_in:
                         if role == "banned":
                             st.error("This account has been banned by an administrator.")
                         else:
+                            st.session_state.ignore_cookie = False
                             st.session_state.logged_in = True
                             st.session_state.username = username.strip()
                             st.session_state.role = role
@@ -258,9 +256,8 @@ if page == "My Profile":
         st.session_state.username = ""
         st.session_state.role = "viewer"
         st.session_state.page = "Dashboard"
-        st.session_state.force_logout = True
+        st.session_state.ignore_cookie = True
         cookie_manager.delete("cm_username")
-        # Overwrite just in case
         cookie_manager.set("cm_username", "")
         import time; time.sleep(1)
         st.rerun()
