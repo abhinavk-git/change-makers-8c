@@ -93,7 +93,7 @@ def load_models():
     else:
         return _load_local()
 
-def add_model(title, description, uploaded_file, uploader=""):
+def add_model(title, description, uploaded_file, uploader="", status="pending", subject="", donor_name="", grade=""):
     model_id = uuid.uuid4().hex
     
     if USE_FIREBASE:
@@ -106,6 +106,10 @@ def add_model(title, description, uploaded_file, uploader=""):
             "description": description,
             "image_url": image_b64,
             "uploader": uploader,
+            "status": status,
+            "subject": subject,
+            "donor_name": donor_name,
+            "grade": grade,
             "created_at": firestore.SERVER_TIMESTAMP
         })
     else:
@@ -117,6 +121,10 @@ def add_model(title, description, uploaded_file, uploader=""):
             "description": description,
             "image_url": image_b64,
             "uploader": uploader,
+            "status": status,
+            "subject": subject,
+            "donor_name": donor_name,
+            "grade": grade,
             "created_at": str(datetime.datetime.now())
         })
         _save_local(models)

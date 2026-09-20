@@ -526,6 +526,14 @@ elif page in ["Send a Model", "Add a Model"]:
     with st.form("add_model_form", clear_on_submit=True):
         title = st.text_input("Model Name", max_chars=100)
         desc = st.text_area("Description")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            subject = st.text_input("Subject", placeholder="e.g. Biology, Physics, Art")
+            grade = st.text_input("Grade / Class", placeholder="e.g. Grade 10, Class 8")
+        with col2:
+            donor_name = st.text_input("Donated By (Name)", placeholder="Name of the person who donated")
+        
         img = st.file_uploader("Upload Image (Optional)", type=["jpg", "jpeg", "png", "webp"])
         
         submitted = st.form_submit_button("Add Model" if is_super else "Send Model")
@@ -533,13 +541,15 @@ elif page in ["Send a Model", "Add a Model"]:
             if title:
                 with st.spinner("Uploading..."):
                     status = "approved" if st.session_state.role == "super_admin" else "pending"
-                    db.add_model(title, desc, img, uploader=st.session_state.username, status=status)
+                    db.add_model(title, desc, img, uploader=st.session_state.username, status=status,
+                                 subject=subject, donor_name=donor_name, grade=grade)
                 if status == "approved":
                     st.success("Model added successfully! Switch to the Dashboard to see it.")
                 else:
                     st.success("Model submitted for verification! A Super Admin will review it shortly.")
             else:
                 st.error("Please provide at least a name for the model.")
+
     
 # --- PAGE: DASHBOARD ---
 elif page == "Dashboard":
@@ -585,6 +595,14 @@ elif page == "Dashboard":
                     with col:
                         with st.container(border=True):
                             st.subheader(m.get("title", "Untitled"))
+                            
+                            # Metadata tags
+                            meta_parts = []
+                            if m.get("subject"): meta_parts.append(f"📚 {m['subject']}")
+                            if m.get("grade"):   meta_parts.append(f"🎓 {m['grade']}")
+                            if m.get("donor_name"): meta_parts.append(f"🎁 Donated by {m['donor_name']}")
+                            if meta_parts:
+                                st.caption(" · ".join(meta_parts))
                         
                             if m.get("image_url"):
                                 st.image(m["image_url"], use_container_width=True)
