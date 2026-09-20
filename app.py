@@ -58,12 +58,38 @@ hide_st_style = """<style>
             header {visibility: hidden;}
             footer {visibility: hidden; display: none;}
             .stDeployButton {display:none !important;}
-            button[title="Collapse sidebar"] {display: none !important;}
-            button[title="Expand sidebar"] {display: none !important;}
-            [data-testid="collapsedControl"] {display: none !important;}
-            [data-testid="stSidebarCollapseButton"] {display: none !important;}
-            [data-testid="stSidebarCollapseControl"] {display: none !important;}
-            [data-testid="stSidebarHeader"] button {display: none !important;}
+            /* Make Sidebar Expand/Collapse Arrows Highly Visible */
+            button[title="Collapse sidebar"],
+            button[title="Expand sidebar"],
+            [data-testid="collapsedControl"],
+            [data-testid="stSidebarCollapseButton"],
+            [data-testid="stSidebarCollapseControl"] {
+                display: flex !important;
+                background-color: #C5A059 !important;
+                border-radius: 50% !important;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
+                width: 45px !important;
+                height: 45px !important;
+                justify-content: center !important;
+                align-items: center !important;
+                z-index: 999999 !important;
+                transition: all 0.3s ease !important;
+            }
+            /* Darken the SVG arrow inside the gold circle */
+            [data-testid="collapsedControl"] svg,
+            [data-testid="stSidebarCollapseButton"] svg,
+            [data-testid="stSidebarCollapseControl"] svg {
+                fill: #1A1A1A !important;
+                color: #1A1A1A !important;
+                width: 24px !important;
+                height: 24px !important;
+            }
+            [data-testid="collapsedControl"]:hover,
+            [data-testid="stSidebarCollapseButton"]:hover,
+            [data-testid="stSidebarCollapseControl"]:hover {
+                transform: scale(1.1) !important;
+                background-color: #e0b665 !important;
+            }
             /* Completely Hide Streamlit Community Cloud Badge & Git Links */
             [data-testid="stViewerBadge"] {display: none !important;}
             .viewerBadge_container__1JCbc {display: none !important;}
