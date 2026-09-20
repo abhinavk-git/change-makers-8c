@@ -303,8 +303,28 @@ elif page in ["Send a Model", "Add a Model"]:
     
 # --- PAGE: DASHBOARD ---
 elif page == "Dashboard":
-    st.title(f"Hi {st.session_state.username}")
-    st.markdown("welcome to model museum")
+    # Decorative Custom CSS for brutalist cards
+    st.markdown("""
+    <style>
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        border: 2px solid var(--text-color) !important;
+        border-radius: 0px !important;
+        box-shadow: 5px 5px 0px #ff4b4b !important;
+        transition: all 0.2s ease;
+    }
+    [data-testid="stVerticalBlockBorderWrapper"]:hover {
+        transform: translate(-3px, -3px);
+        box-shadow: 8px 8px 0px #ff4b4b !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div style="border-bottom: 4px solid #ff4b4b; margin-bottom: 30px; padding-bottom: 10px;">
+        <h1 style="font-size: 2.5rem; margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Hi {st.session_state.username}</h1>
+        <p style="font-size: 1.1rem; opacity: 0.7; text-transform: uppercase; font-weight: bold; margin-top: 5px;">Welcome to the curated model museum</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     # --- MAIN CONTENT: GALLERY ---
     all_models = db.load_models()
@@ -320,33 +340,34 @@ elif page == "Dashboard":
                 if i + j < len(models):
                     m = models[i + j]
                     with col:
-                        st.subheader(m.get("title", "Untitled"))
+                        with st.container(border=True):
+                            st.subheader(m.get("title", "Untitled"))
                         
-                        if m.get("image_url"):
-                            st.image(m["image_url"], use_container_width=True)
+                            if m.get("image_url"):
+                                st.image(m["image_url"], use_container_width=True)
                         
-                        if m.get("description"):
-                            st.write(m["description"])
+                            if m.get("description"):
+                                st.write(m["description"])
                             
-                        # Edit / Delete Section
-                        if st.session_state.role in ["admin", "super_admin"]:
-                            with st.expander("Edit / Delete"):
-                                with st.form(f"edit_form_{m['id']}"):
-                                    edit_title = st.text_input("Name", value=m.get("title", ""))
-                                    edit_desc = st.text_area("Description", value=m.get("description", ""))
-                                    edit_img = st.file_uploader("New Image (optional)", type=["jpg", "jpeg", "png", "webp"])
+                            # Edit / Delete Section
+                            if st.session_state.role in ["admin", "super_admin"]:
+                                with st.expander("Edit / Delete"):
+                                    with st.form(f"edit_form_{m['id']}"):
+                                        edit_title = st.text_input("Name", value=m.get("title", ""))
+                                        edit_desc = st.text_area("Description", value=m.get("description", ""))
+                                        edit_img = st.file_uploader("New Image (optional)", type=["jpg", "jpeg", "png", "webp"])
                                     
-                                    col1, col2 = st.columns(2)
-                                    with col1:
-                                        if st.form_submit_button("Update"):
-                                            with st.spinner("Updating..."):
-                                                db.update_model(m["id"], edit_title, edit_desc, edit_img)
-                                            st.success("Updated!")
-                                            st.rerun()
-                                    with col2:
-                                        if st.form_submit_button("Delete"):
-                                            db.delete_model(m["id"])
-                                            st.rerun()
+                                        col1, col2 = st.columns(2)
+                                        with col1:
+                                            if st.form_submit_button("Update"):
+                                                with st.spinner("Updating..."):
+                                                    db.update_model(m["id"], edit_title, edit_desc, edit_img)
+                                                st.success("Updated!")
+                                                st.rerun()
+                                        with col2:
+                                            if st.form_submit_button("Delete"):
+                                                db.delete_model(m["id"])
+                                                st.rerun()
 
 
 # --- PAGE: APPROVE A MODEL ---
