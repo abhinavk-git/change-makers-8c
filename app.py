@@ -81,10 +81,12 @@ cookie_manager = stx.CookieManager()
 
 stored_username = cookie_manager.get(cookie="cm_username")
 if stored_username and not st.session_state.logged_in:
-    st.session_state.logged_in = True
-    st.session_state.username = stored_username
-    st.session_state.role = db.get_user_role(stored_username)
-    st.rerun()
+    role = db.get_user_role(stored_username)
+    if role != "banned":
+        st.session_state.logged_in = True
+        st.session_state.username = stored_username
+        st.session_state.role = role
+        st.rerun()
 
 if not st.session_state.logged_in:
     # Use columns to center the login form and prevent it from stretching
@@ -146,12 +148,16 @@ if not st.session_state.logged_in:
                         correct_password = st.secrets.get("admin_password", correct_password)
                     
                     if password == correct_password and len(username.strip()) > 0:
-                        st.session_state.logged_in = True
-                        st.session_state.username = username.strip()
-                        st.session_state.role = db.get_user_role(username.strip())
-                        cookie_manager.set("cm_username", username.strip(), expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
-                        import time; time.sleep(1) # Wait for cookie to save
-                        st.rerun()
+                        role = db.get_user_role(username.strip())
+                        if role == "banned":
+                            st.error("🚫 This account has been banned by an administrator.")
+                        else:
+                            st.session_state.logged_in = True
+                            st.session_state.username = username.strip()
+                            st.session_state.role = role
+                            cookie_manager.set("cm_username", username.strip(), expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
+                            import time; time.sleep(1) # Wait for cookie to save
+                            st.rerun()
                     else:
                         st.error("Incorrect username or password.")
                         
@@ -293,16 +299,33 @@ if page == "Super Admin":
             if u_name.lower() == "abhinavk": continue # Cannot change super admin
             
             with st.container():
-                ucol1, ucol2, ucol3 = st.columns([2, 1, 1])
+                ucol1, ucol2, ucol3, ucol4 = st.columns([2, 1, 1, 1])
                 with ucol1:
-                    st.write(f"**{u_name}** ({u_role})")
+                    st.write(f"**{u_name}** ({u_role.upper()})")
+                
                 with ucol2:
-                    if u_role != "admin" and st.button(f"Promote to Admin", key=f"promo_{u_name}"):
-                        db.set_user_role(u_name, "admin")
-                        st.rerun()
+                    if u_role == "banned":
+                        st.write(" ") # empty
+                    elif u_role != "admin":
+                        if st.button("Promote ⬆️", key=f"promo_{u_name}"):
+                            db.set_user_role(u_name, "admin")
+                            st.rerun()
+                
                 with ucol3:
-                    if u_role != "viewer" and st.button(f"Demote to Viewer", key=f"demo_{u_name}"):
-                        db.set_user_role(u_name, "viewer")
-                        st.rerun()
+                    if u_role == "banned":
+                        if st.button("Unban 🟢", key=f"unban_{u_name}"):
+                            db.set_user_role(u_name, "viewer")
+                            st.rerun()
+                    elif u_role != "viewer":
+                        if st.button("Demote ⬇️", key=f"demo_{u_name}"):
+                            db.set_user_role(u_name, "viewer")
+                            st.rerun()
+                
+                with ucol4:
+                    if u_role != "banned":
+                        if st.button("Ban 🚫", type="primary", key=f"ban_{u_name}"):
+                            db.set_user_role(u_name, "banned")
+                            st.rerun()
+                            
                 st.markdown("---")
 
