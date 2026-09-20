@@ -308,3 +308,47 @@ def get_pending_appeals():
             if b.get("active", False) and b.get("appeal_status") == "pending":
                 appeals.append({"username": uname, "appeal": b.get("appeal"), "reason": b.get("reason")})
     return appeals
+
+# --- CHAT & NOTIFICATIONS ---
+MESSAGES_FILE = "messages.json"
+
+def _load_messages():
+    if not os.path.exists(MESSAGES_FILE): return []
+    try:
+        with open(MESSAGES_FILE, "r") as f: return json.load(f)
+    except: return []
+
+def _save_messages(msgs):
+    with open(MESSAGES_FILE, "w") as f: json.dump(msgs, f, indent=4)
+
+def send_message(sender, recipient, text):
+    import datetime
+    msgs = _load_messages()
+    msgs.append({
+        "id": str(int(datetime.datetime.now().timestamp() * 1000)),
+        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "sender": sender,
+        "recipient": recipient,
+        "text": text,
+        "read": False
+    })
+    _save_messages(msgs)
+
+def get_messages_for_user(username):
+    msgs = _load_messages()
+    # return messages where the user is either sender or recipient
+    return [m for m in msgs if m["sender"] == username or m["recipient"] == username]
+
+def mark_messages_read(username):
+    msgs = _load_messages()
+    changed = False
+    for m in msgs:
+        if m["recipient"] == username and not m["read"]:
+            m["read"] = True
+            changed = True
+    if changed:
+        _save_messages(msgs)
+
+def get_unread_count(username):
+    msgs = _load_messages()
+    return sum(1 for m in msgs if m["recipient"] == username and not m["read"])
