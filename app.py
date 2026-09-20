@@ -64,9 +64,17 @@ hide_st_style = """<style>
             [data-testid="stSidebarCollapseButton"] {display: none !important;}
             [data-testid="stSidebarCollapseControl"] {display: none !important;}
             [data-testid="stSidebarHeader"] button {display: none !important;}
+            /* Completely Hide Streamlit Community Cloud Badge & Git Links */
             [data-testid="stViewerBadge"] {display: none !important;}
+            .viewerBadge_container__1JCbc {display: none !important;}
+            .viewerBadge_link__1S137 {display: none !important;}
+            .viewerBadge_text__1JaDK {display: none !important;}
             div[class^='viewerBadge'] {display: none !important;}
             div[class*='viewerBadge'] {display: none !important;}
+            a[href*="streamlit.io/cloud"] {display: none !important;}
+            a[href*="github.com"] {display: none !important;} /* Hide any rogue git links in the footer */
+            #viewerBadge_container {display: none !important;}
+            .st-emotion-cache-ch5dnh {display: none !important;} /* Common wrapper */
 
             [data-testid="stSidebar"] div[data-testid="stVerticalBlock"] {
                 height: 100%; min-height: calc(100vh - 8rem);
