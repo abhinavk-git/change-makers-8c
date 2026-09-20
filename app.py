@@ -200,10 +200,13 @@ with st.sidebar:
     st.title("Museum Menu")
     if st.button("Dashboard", use_container_width=True):
         st.session_state.page = "Dashboard"
-    if st.button("Send a Model", use_container_width=True):
-        st.session_state.page = "Send a Model"
+    action_name = "Add a Model" if st.session_state.role == "super_admin" else "Send a Model"
+    if st.button(action_name, use_container_width=True):
+        st.session_state.page = action_name
         
     if st.session_state.role == "super_admin":
+        if st.button("Approve a Model", use_container_width=True):
+            st.session_state.page = "Approve a Model"
         if st.button("Super Admin Settings", use_container_width=True):
             st.session_state.page = "Super Admin"
             
@@ -275,8 +278,9 @@ if page == "My Profile":
         st.rerun()
 
 # --- PAGE: ADD A MODEL ---
-elif page == "Send a Model":
-    st.title("Send a New Model")
+elif page in ["Send a Model", "Add a Model"]:
+    is_super = st.session_state.role == "super_admin"
+    st.title("Add a New Model" if is_super else "Send a New Model")
     st.markdown("Fill out the details below to add a new model to the museum.")
     
     with st.form("add_model_form", clear_on_submit=True):
@@ -284,7 +288,7 @@ elif page == "Send a Model":
         desc = st.text_area("Description")
         img = st.file_uploader("Upload Image (Optional)", type=["jpg", "jpeg", "png", "webp"])
         
-        submitted = st.form_submit_button("Send Model")
+        submitted = st.form_submit_button("Add Model" if is_super else "Send Model")
         if submitted:
             if title:
                 with st.spinner("Uploading..."):
@@ -307,7 +311,7 @@ elif page == "Dashboard":
     models = [m for m in all_models if m.get("status", "approved") == "approved"]
 
     if not models:
-        st.info("The museum is currently empty. Go to 'Send a Model' in the sidebar to be the first!")
+        st.info("The museum is currently empty. Go to the sidebar to add the first model!")
     else:
         cols_per_row = 3
         for i in range(0, len(models), cols_per_row):
@@ -344,17 +348,12 @@ elif page == "Dashboard":
                                             db.delete_model(m["id"])
                                             st.rerun()
 
-# --- PAGE: SUPER ADMIN ---
-if page == "Super Admin":
-    if st.session_state.username.lower() != "abhinavk":
-        st.error("Access Denied.")
-        st.stop()
-        
-    st.title("Super Admin Panel")
-    st.markdown(f"Welcome to the master control panel, **{st.session_state.username}**.")
+
+# --- PAGE: APPROVE A MODEL ---
+elif page == "Approve a Model" and st.session_state.role == "super_admin":
+    st.title("Approve a Model")
+    st.markdown("Review models submitted by viewers and admins.")
     
-    
-    st.subheader("Model Verification Queue")
     all_models = db.load_models()
     pending_models = [m for m in all_models if m.get("status") == "pending"]
     if not pending_models:
@@ -377,7 +376,18 @@ if page == "Super Admin":
                         db.delete_model(m['id'])
                         st.rerun()
                 st.markdown("---")
-                
+
+# --- PAGE: SUPER ADMIN ---
+
+if page == "Super Admin":
+    if st.session_state.username.lower() != "abhinavk":
+        st.error("Access Denied.")
+        st.stop()
+        
+    st.title("Super Admin Panel")
+    st.markdown(f"Welcome to the master control panel, **{st.session_state.username}**.")
+    
+    
     st.subheader("User Management")
     users_dict = db.get_all_users()
     
