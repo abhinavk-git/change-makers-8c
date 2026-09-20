@@ -16,6 +16,9 @@ hide_st_style = """
             button[title="Collapse sidebar"] {display: none !important;}
             button[title="Expand sidebar"] {display: none !important;}
             [data-testid="collapsedControl"] {display: none !important;}
+            [data-testid="stSidebarCollapseButton"] {display: none !important;}
+            [data-testid="stSidebarCollapseControl"] {display: none !important;}
+            [data-testid="stSidebarHeader"] button {display: none !important;}
             [data-testid="stViewerBadge"] {display: none !important;}
             div[class^='viewerBadge'] {display: none !important;}
             div[class*='viewerBadge'] {display: none !important;}
@@ -25,6 +28,7 @@ st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
 # --- FIREBASE AUTHENTICATION SETUP ---
+import os
 auth = None
 USE_FIREBASE_AUTH = False
 firebase_setup_error = None
@@ -37,15 +41,23 @@ try:
 except Exception:
     pass
 
+def get_secret(key):
+    if secrets_exist and key in st.secrets:
+        return st.secrets[key]
+    return os.environ.get(key)
+
+api_key = get_secret("firebase_api_key")
+proj_id = get_secret("firebase_project_id")
+
 try:
-    if secrets_exist and "firebase_api_key" in st.secrets and "firebase_project_id" in st.secrets:
+    if api_key and proj_id:
         import pyrebase
         config = {
-            "apiKey": st.secrets["firebase_api_key"],
-            "authDomain": f"{st.secrets['firebase_project_id']}.firebaseapp.com",
-            "projectId": st.secrets["firebase_project_id"],
+            "apiKey": api_key,
+            "authDomain": f"{proj_id}.firebaseapp.com",
+            "projectId": proj_id,
             "databaseURL": "",
-            "storageBucket": f"{st.secrets['firebase_project_id']}.appspot.com",
+            "storageBucket": f"{proj_id}.appspot.com",
             "messagingSenderId": "",
             "appId": "",
             "measurementId": ""
