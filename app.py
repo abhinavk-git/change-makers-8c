@@ -289,6 +289,14 @@ elif page == "My Profile":
     st.title("My Profile")
     st.markdown(f"**Username:** {st.session_state.username}")
     
+    # Format the position
+    if st.session_state.username.lower() == "abhinavk":
+        display_role = "Owner (Super Admin)"
+    else:
+        display_role = st.session_state.role.replace("_", " ").title()
+        
+    st.markdown(f"**Position:** {display_role}")
+    
     # Calculate donated models
     models = db.load_models()
     my_models = [m for m in models if m.get("uploader") == st.session_state.username]
