@@ -10,6 +10,7 @@ st.set_page_config(page_title="Change Makers 8c", page_icon="🏛️", layout="w
 hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
+            header {visibility: hidden;}
             footer {visibility: hidden;}
             .stDeployButton {display:none;}
             button[title="Collapse sidebar"] {display: none;}
