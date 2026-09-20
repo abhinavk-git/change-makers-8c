@@ -216,8 +216,8 @@ elif page == "Add a Model":
     
 # --- PAGE: DASHBOARD ---
 elif page == "Dashboard":
-    st.title("🏛️ Change Makers Model Museum")
-    st.markdown("Welcome to the Model Museum! Explore our models below.")
+    st.title(f"Hi {st.session_state.username}")
+    st.markdown("welcome to model museum")
 
     # --- MAIN CONTENT: GALLERY ---
     models = db.load_models()
