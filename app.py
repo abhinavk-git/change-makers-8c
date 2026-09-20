@@ -138,15 +138,13 @@ if not st.session_state.logged_in:
                 username = st.text_input("Username")
                 password = st.text_input("Password", type="password")
                 if st.form_submit_button("Login"):
-                    correct_username = "admin"
                     correct_password = "changemakers"
                     if secrets_exist:
-                        correct_username = st.secrets.get("admin_username", correct_username)
                         correct_password = st.secrets.get("admin_password", correct_password)
                     
-                    if username == correct_username and password == correct_password:
+                    if password == correct_password and len(username.strip()) > 0:
                         st.session_state.logged_in = True
-                        st.session_state.username = username
+                        st.session_state.username = username.strip()
                         cookie_manager.set("cm_username", username, expires_at=datetime.datetime.now() + datetime.timedelta(days=1))
                         import time; time.sleep(1) # Wait for cookie to save
                         st.rerun()
@@ -165,6 +163,11 @@ with st.sidebar:
         st.session_state.page = "Dashboard"
     if st.button("Add a Model", use_container_width=True):
         st.session_state.page = "Add a Model"
+        
+    if st.session_state.username.lower() == "abhinavk":
+        if st.button("Super Admin Settings", use_container_width=True):
+            st.session_state.page = "Super Admin"
+            
     st.markdown("<br>" * 18, unsafe_allow_html=True) # Push to bottom
     
     # Profile Indicator with Circle
@@ -255,3 +258,24 @@ elif page == "Dashboard":
                                     if st.form_submit_button("Delete ❌"):
                                         db.delete_model(m["id"])
                                         st.rerun()
+
+# --- PAGE: SUPER ADMIN ---
+if page == "Super Admin":
+    if st.session_state.username.lower() != "abhinavk":
+        st.error("🚫 Access Denied.")
+        st.stop()
+        
+    st.title("👑 Super Admin Panel")
+    st.markdown(f"Welcome to the master control panel, **{st.session_state.username}**.")
+    
+    st.subheader("Database Controls")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Delete All Models (DANGER)", type="primary"):
+            st.warning("This would wipe the database if connected!")
+    with col2:
+        if st.button("Export Database Backup"):
+            st.success("Backup functionality coming soon.")
+            
+    st.subheader("User Management")
+    st.info("Currently, anyone with the master password can log in. In the future, you can manage individual user accounts here.")
