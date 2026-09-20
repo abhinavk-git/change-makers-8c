@@ -24,7 +24,8 @@ if st.session_state.theme == "Light":
             }
             /* Make sure the main container is somewhat transparent so we can see the background */
             .block-container {
-                background-color: rgba(26, 26, 26, 0.85) !important;
+                background-color: rgba(26, 26, 26, 0.92) !important;
+                backdrop-filter: blur(15px);
                 border-radius: 10px;
                 margin-top: 60px !important; margin-bottom: 60px !important;
                 box-shadow: 0px 10px 30px rgba(0,0,0,0.7);
@@ -33,7 +34,8 @@ if st.session_state.theme == "Light":
             
             /* Make sidebar transparent glass */
             [data-testid="stSidebar"] {
-                background-color: rgba(38, 36, 33, 0.85) !important;
+                background-color: rgba(38, 36, 33, 0.95) !important;
+                backdrop-filter: blur(15px);
             }
 
             </style>
@@ -122,7 +124,8 @@ hide_st_style = """
             }
             /* Make sure the main container is somewhat transparent so we can see the background */
             .block-container {
-                background-color: rgba(26, 26, 26, 0.85) !important;
+                background-color: rgba(26, 26, 26, 0.92) !important;
+                backdrop-filter: blur(15px);
                 border-radius: 10px;
                 margin-top: 60px !important; margin-bottom: 60px !important;
                 box-shadow: 0px 10px 30px rgba(0,0,0,0.7);
@@ -131,7 +134,8 @@ hide_st_style = """
             
             /* Make sidebar transparent glass */
             [data-testid="stSidebar"] {
-                background-color: rgba(38, 36, 33, 0.85) !important;
+                background-color: rgba(38, 36, 33, 0.95) !important;
+                backdrop-filter: blur(15px);
             }
 
             </style>
@@ -609,7 +613,8 @@ elif page == "Dashboard":
             }
             /* Make sure the main container is somewhat transparent so we can see the background */
             .block-container {
-                background-color: rgba(26, 26, 26, 0.85) !important;
+                background-color: rgba(26, 26, 26, 0.92) !important;
+                backdrop-filter: blur(15px);
                 border-radius: 10px;
                 margin-top: 60px !important; margin-bottom: 60px !important;
                 box-shadow: 0px 10px 30px rgba(0,0,0,0.7);
@@ -618,7 +623,8 @@ elif page == "Dashboard":
             
             /* Make sidebar transparent glass */
             [data-testid="stSidebar"] {
-                background-color: rgba(38, 36, 33, 0.85) !important;
+                background-color: rgba(38, 36, 33, 0.95) !important;
+                backdrop-filter: blur(15px);
             }
 
             </style>
