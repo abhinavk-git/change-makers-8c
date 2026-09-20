@@ -256,8 +256,8 @@ if page == "My Profile":
     
     st.markdown("---")
     st.subheader("Preferences")
-    theme_choice = st.radio("App Theme", ["Light", "Dark"], horizontal=True)
-    if theme_choice == "Dark":
+    theme_choice = st.radio("App Theme", ["Dark", "Light"], horizontal=True)
+    if theme_choice == "Light":
         st.markdown("""
         <style>
             html { filter: invert(1) hue-rotate(180deg); }
