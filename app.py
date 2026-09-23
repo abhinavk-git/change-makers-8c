@@ -260,7 +260,7 @@ if not st.session_state.logged_in:
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        st.title("Museum Entry")
+        st.title("Welcome to the Model Museum")
         st.markdown("Please enter your details to access the Model Museum.")
         
         user_type = st.radio("Are you a Student or Staff?", ["Student", "Staff"], horizontal=True)
@@ -286,6 +286,9 @@ if not st.session_state.logged_in:
                     else:
                         display_name = f"{name.strip()} ({subject.strip()})"
                         
+                    if name.strip().lower() == "abhinavk" and user_type == "Staff" and subject.strip().lower() == "admin":
+                        display_name = "abhinavk"
+                        
                     role = db.get_user_role(display_name)
                     if role == "banned":
                         st.error("This name is banned.")
@@ -297,116 +300,6 @@ if not st.session_state.logged_in:
                         st.query_params["u"] = display_name
                         st.rerun()
 
-        with st.expander("Admin / Existing Account Login"):
-            
-            if USE_FIREBASE_AUTH:
-                tab1, tab2 = st.tabs(["Login", "Create Account"])
-                
-                with tab1:
-                    with st.form("login_form"):
-                        username = st.text_input("Username")
-                        password = st.text_input("Password", type="password")
-                        if st.form_submit_button("Login"):
-                            fake_email = f"{username.lower().replace(' ', '')}@changemakers.local"
-                            try:
-                                user = auth.sign_in_with_email_and_password(fake_email, password)
-                                role = db.get_user_role(username)
-                                if role == "banned":
-                                    active_ban = db.get_active_ban(username)
-                                    reason = active_ban.get("reason", "No reason provided.") if active_ban else "Violations of policy."
-                                    st.error(f"**ACCOUNT BANNED**\n\n**Reason:** {reason}")
-                                    
-                                    if active_ban and active_ban.get("appeal_status") == "pending":
-                                        st.info("Your appeal is currently under review by the Owner.")
-                                    else:
-                                        with st.expander("Appeal Ban"):
-                                            with st.form("appeal_form"):
-                                                appeal_text = st.text_area("Why should your ban be lifted?")
-                                                if st.form_submit_button("Submit Appeal"):
-                                                    if appeal_text.strip():
-                                                        db.submit_ban_appeal(username, appeal_text.strip())
-                                                        st.success("Appeal submitted successfully.")
-                                                    else:
-                                                        st.error("Please enter an appeal message.")
-                                else:
-                                    st.session_state.ignore_session = False
-                                    st.session_state.logged_in = True
-                                    st.session_state.username = username
-                                    st.session_state.role = role
-                                    st.query_params["u"] = username
-                            except Exception as e:
-                                try:
-                                    import json
-                                    error_json = e.args[1]
-                                    error_data = json.loads(error_json)
-                                    st.error(f"Login failed: {error_data['error']['message']}")
-                                except:
-                                    st.error(f"Login failed: {str(e)}")
-                                
-                with tab2:
-                    with st.form("signup_form"):
-                        new_username = st.text_input("Choose a Username")
-                        new_password = st.text_input("Choose a Password (min 6 characters)", type="password")
-                        if st.form_submit_button("Create Account"):
-                            fake_email = f"{new_username.lower().replace(' ', '')}@changemakers.local"
-                            try:
-                                user = auth.create_user_with_email_and_password(fake_email, new_password)
-                                st.success(f"Account '{new_username}' created successfully! Please log in on the other tab.")
-                            except Exception as e:
-                                try:
-                                    import json
-                                    error_json = e.args[1]
-                                    error_data = json.loads(error_json)
-                                    st.error(f"Error creating account: {error_data['error']['message']}")
-                                except:
-                                    st.error(f"Error creating account: {str(e)}")
-            else:
-                if firebase_setup_error:
-                    st.error(f" Firebase Error: {firebase_setup_error}")
-                    
-                if not secrets_exist:
-                    st.error("No secrets file found. If you are running locally, create `.streamlit/secrets.toml`")
-                elif "firebase_api_key" not in st.secrets or "firebase_project_id" not in st.secrets:
-                    st.error("Missing `firebase_api_key` or `firebase_project_id` in secrets.")
-                    
-                st.warning("Firebase Authentication is not configured yet. Falling back to simple admin password.")
-                
-                with st.form("simple_login_form"):
-                    username = st.text_input("Username")
-                    password = st.text_input("Password", type="password")
-                    if st.form_submit_button("Login"):
-                        correct_password = "changemakers"
-                        if secrets_exist:
-                            correct_password = st.secrets.get("admin_password", correct_password)
-                        
-                        if password == correct_password and len(username.strip()) > 0:
-                            role = db.get_user_role(username.strip())
-                            if role == "banned":
-                                active_ban = db.get_active_ban(username.strip())
-                                reason = active_ban.get("reason", "No reason provided.") if active_ban else "Violations of policy."
-                                st.error(f"**ACCOUNT BANNED**\n\n**Reason:** {reason}")
-                                
-                                if active_ban and active_ban.get("appeal_status") == "pending":
-                                    st.info("Your appeal is currently under review by the Owner.")
-                                else:
-                                    with st.expander("Appeal Ban"):
-                                        with st.form("appeal_form2"):
-                                            appeal_text = st.text_area("Why should your ban be lifted?")
-                                            if st.form_submit_button("Submit Appeal"):
-                                                if appeal_text.strip():
-                                                    db.submit_ban_appeal(username.strip(), appeal_text.strip())
-                                                    st.success("Appeal submitted successfully.")
-                                                else:
-                                                    st.error("Please enter an appeal message.")
-                            else:
-                                st.session_state.ignore_session = False
-                                st.session_state.logged_in = True
-                                st.session_state.username = username.strip()
-                                st.session_state.role = role
-                                st.query_params["u"] = username.strip()
-                        else:
-                            st.error("Incorrect username or password.")
-                            
     if not st.session_state.logged_in:
         st.stop()
     else:
