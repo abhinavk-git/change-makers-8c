@@ -54,12 +54,19 @@ st.markdown(bg_css, unsafe_allow_html=True)
 
 hide_st_style = """<style>
 
+            /* Hide Streamlit chrome — but NOT the sidebar toggle button */
             #MainMenu {visibility: hidden;}
-            header {background: transparent !important; visibility: visible !important;} [data-testid="stToolbar"] {visibility: hidden !important;} .stDeployButton {display: none !important;}
             footer {visibility: hidden; display: none;}
             .stDeployButton {display:none !important;}
-            /* Make Sidebar Expand/Collapse Arrows Highly Visible */
-            /* Target EVERY possible class/id for the expand button across Streamlit versions */
+            [data-testid="stToolbar"] {visibility: hidden !important;}
+            /* Hide the header but keep the sidebar collapse button visible */
+            /* We do this by hiding only the parts of the header we don't want */
+            header[data-testid="stHeader"] > * {visibility: hidden !important;}
+            /* But show the collapse/expand button that lives inside the header */
+            header[data-testid="stHeader"] [data-testid="collapsedControl"],
+            header[data-testid="stHeader"] [data-testid="stSidebarCollapsedControl"],
+            header[data-testid="stHeader"] button[title="Collapse sidebar"],
+            header[data-testid="stHeader"] button[title="Expand sidebar"],
             [data-testid="collapsedControl"],
             [data-testid="stSidebarCollapsedControl"],
             [data-testid="stSidebarCollapseButton"],
@@ -84,13 +91,13 @@ hide_st_style = """<style>
                 pointer-events: auto !important;
             }
 
-            /* Darken the SVG arrow inside the gold circle */
+            /* Arrow SVG color */
             [data-testid="collapsedControl"] svg,
             [data-testid="stSidebarCollapsedControl"] svg,
             [data-testid="stSidebarCollapseButton"] svg,
             [data-testid="stSidebarCollapseControl"] svg,
             button[title="Collapse sidebar"] svg,
-            button[title="Expand sidebar"] svg svg {
+            button[title="Expand sidebar"] svg {
                 color: #262421 !important;
                 fill: #262421 !important;
                 stroke: #262421 !important;
@@ -103,7 +110,7 @@ hide_st_style = """<style>
             [data-testid="collapsedControl"]:hover,
             [data-testid="stSidebarCollapsedControl"]:hover,
             [data-testid="stSidebarCollapseButton"]:hover,
-            [data-testid="stSidebarCollapseControl"]:hover :hover {
+            [data-testid="stSidebarCollapseControl"]:hover {
                 background-color: #dcb873 !important;
                 transform: scale(1.1) !important;
                 transition: all 0.2s ease-in-out !important;
