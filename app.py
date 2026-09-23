@@ -55,15 +55,18 @@ st.markdown(bg_css, unsafe_allow_html=True)
 hide_st_style = """<style>
 
             #MainMenu {visibility: hidden;}
-            header {visibility: hidden;}
+            header {background: transparent !important;} [data-testid="stToolbar"] {visibility: hidden !important;} .stDeployButton {display: none !important;}
             footer {visibility: hidden; display: none;}
             .stDeployButton {display:none !important;}
             /* Make Sidebar Expand/Collapse Arrows Highly Visible */
             button[title="Collapse sidebar"],
             button[title="Expand sidebar"],
             [data-testid="collapsedControl"],
+            [data-testid="stSidebarCollapsedControl"],
             [data-testid="stSidebarCollapseButton"],
             [data-testid="stSidebarCollapseControl"] {
+                visibility: visible !important;
+                opacity: 1 !important;
                 display: flex !important;
                 background-color: #C5A059 !important;
                 border-radius: 50% !important;
@@ -77,6 +80,7 @@ hide_st_style = """<style>
             }
             /* Darken the SVG arrow inside the gold circle */
             [data-testid="collapsedControl"] svg,
+            [data-testid="stSidebarCollapsedControl"] svg,
             [data-testid="stSidebarCollapseButton"] svg,
             [data-testid="stSidebarCollapseControl"] svg {
                 fill: #1A1A1A !important;
@@ -85,6 +89,7 @@ hide_st_style = """<style>
                 height: 24px !important;
             }
             [data-testid="collapsedControl"]:hover,
+            [data-testid="stSidebarCollapsedControl"]:hover,
             [data-testid="stSidebarCollapseButton"]:hover,
             [data-testid="stSidebarCollapseControl"]:hover {
                 transform: scale(1.1) !important;
@@ -180,7 +185,11 @@ hide_st_style = """<style>
             }
             
             /* Move the expand button down so it's not covered by the top navbar blur */
-            [data-testid="collapsedControl"] {
+            [data-testid="collapsedControl"],
+            [data-testid="stSidebarCollapsedControl"],
+            [data-testid="stSidebarCollapseButton"],
+            [data-testid="stSidebarCollapseControl"],
+            button[kind="header"] {
                 position: fixed !important;
                 top: 65px !important;
                 left: 15px !important;
