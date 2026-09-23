@@ -55,66 +55,58 @@ st.markdown(bg_css, unsafe_allow_html=True)
 hide_st_style = """<style>
 
             #MainMenu {visibility: hidden;}
-            header {background: transparent !important;} [data-testid="stToolbar"] {visibility: hidden !important;} .stDeployButton {display: none !important;}
+            header {background: transparent !important; visibility: visible !important;} [data-testid="stToolbar"] {visibility: hidden !important;} .stDeployButton {display: none !important;}
             footer {visibility: hidden; display: none;}
             .stDeployButton {display:none !important;}
             /* Make Sidebar Expand/Collapse Arrows Highly Visible */
-            button[title="Collapse sidebar"],
-            button[title="Expand sidebar"],
+            /* Target EVERY possible class/id for the expand button across Streamlit versions */
             [data-testid="collapsedControl"],
             [data-testid="stSidebarCollapsedControl"],
             [data-testid="stSidebarCollapseButton"],
-            [data-testid="stSidebarCollapseControl"] {
+            [data-testid="stSidebarCollapseControl"],
+            button[title="Collapse sidebar"],
+            button[title="Expand sidebar"] {
+                display: flex !important;
                 visibility: visible !important;
                 opacity: 1 !important;
-                display: flex !important;
                 background-color: #C5A059 !important;
                 border-radius: 50% !important;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
-                width: 45px !important;
-                height: 45px !important;
-                justify-content: center !important;
+                width: 40px !important;
+                height: 40px !important;
                 align-items: center !important;
-                z-index: 999999 !important;
-                transition: all 0.3s ease !important;
+                justify-content: center !important;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
+                border: 2px solid rgba(255, 255, 255, 0.1) !important;
+                position: fixed !important;
+                top: 65px !important;
+                left: 15px !important;
+                z-index: 9999999 !important;
+                pointer-events: auto !important;
             }
+
             /* Darken the SVG arrow inside the gold circle */
             [data-testid="collapsedControl"] svg,
             [data-testid="stSidebarCollapsedControl"] svg,
             [data-testid="stSidebarCollapseButton"] svg,
-            [data-testid="stSidebarCollapseControl"] svg {
-                fill: #1A1A1A !important;
-                color: #1A1A1A !important;
+            [data-testid="stSidebarCollapseControl"] svg,
+            button[title="Collapse sidebar"] svg,
+            button[title="Expand sidebar"] svg svg {
+                color: #262421 !important;
+                fill: #262421 !important;
+                stroke: #262421 !important;
                 width: 24px !important;
                 height: 24px !important;
+                visibility: visible !important;
+                display: block !important;
             }
+
             [data-testid="collapsedControl"]:hover,
             [data-testid="stSidebarCollapsedControl"]:hover,
             [data-testid="stSidebarCollapseButton"]:hover,
-            [data-testid="stSidebarCollapseControl"]:hover {
+            [data-testid="stSidebarCollapseControl"]:hover :hover {
+                background-color: #dcb873 !important;
                 transform: scale(1.1) !important;
-                background-color: #e0b665 !important;
-            }
-            /* Completely Hide Streamlit Community Cloud Badge & Git Links */
-            [data-testid="stViewerBadge"] {display: none !important;}
-            .viewerBadge_container__1JCbc {display: none !important;}
-            .viewerBadge_link__1S137 {display: none !important;}
-            .viewerBadge_text__1JaDK {display: none !important;}
-            div[class^='viewerBadge'] {display: none !important;}
-            div[class*='viewerBadge'] {display: none !important;}
-            a[href*="streamlit.io/cloud"] {display: none !important;}
-            a[href*="github.com"] {display: none !important;} /* Hide any rogue git links in the footer */
-            #viewerBadge_container {display: none !important;}
-            .st-emotion-cache-ch5dnh {display: none !important;} /* Common wrapper */
-
-            [data-testid="stSidebar"] div[data-testid="stVerticalBlock"] {
-                height: 100%; min-height: calc(100vh - 8rem);
-            }
-            div.element-container:has(.bottom-spacer) {
-                flex-grow: 1;
-            }
-            div.stButton > button {
-                border-radius: 3px !important;
+                transition: all 0.2s ease-in-out !important;
             }
             
             /* Lichess style Top Navbar background */
@@ -188,8 +180,7 @@ hide_st_style = """<style>
             [data-testid="collapsedControl"],
             [data-testid="stSidebarCollapsedControl"],
             [data-testid="stSidebarCollapseButton"],
-            [data-testid="stSidebarCollapseControl"],
-            button[kind="header"] {
+            [data-testid="stSidebarCollapseControl"] {
                 position: fixed !important;
                 top: 65px !important;
                 left: 15px !important;
