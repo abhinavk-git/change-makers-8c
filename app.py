@@ -69,13 +69,38 @@ hide_st_style = """<style>
                 visibility: hidden !important;
             }
 
-            /* Push the native sidebar toggle button below our custom navbar bar */
+            /* Style the native sidebar toggle as a gold circle */
             [data-testid="collapsedControl"],
             [data-testid="stSidebarCollapsedControl"],
             button[title="Collapse sidebar"],
             button[title="Expand sidebar"] {
                 top: 60px !important;
                 z-index: 9999999 !important;
+                background-color: #C5A059 !important;
+                border-radius: 50% !important;
+                width: 40px !important;
+                height: 40px !important;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
+                border: 2px solid rgba(255,255,255,0.15) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                transition: background-color 0.2s, transform 0.2s !important;
+            }
+            [data-testid="collapsedControl"]:hover,
+            [data-testid="stSidebarCollapsedControl"]:hover,
+            button[title="Collapse sidebar"]:hover,
+            button[title="Expand sidebar"]:hover {
+                background-color: #dcb873 !important;
+                transform: scale(1.1) !important;
+            }
+            [data-testid="collapsedControl"] svg,
+            [data-testid="stSidebarCollapsedControl"] svg,
+            button[title="Collapse sidebar"] svg,
+            button[title="Expand sidebar"] svg {
+                color: #262421 !important;
+                fill: #262421 !important;
+                stroke: #262421 !important;
             }
             
             /* Lichess style Top Navbar background */
