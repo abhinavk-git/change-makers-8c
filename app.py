@@ -287,25 +287,63 @@ _sidebar_toggle_js = """
 #custom-sidebar-toggle svg {
     width: 20px;
     height: 20px;
-    fill: #262421;
+    fill: none;
+    stroke: #262421;
+    stroke-width: 2.5;
+    stroke-linecap: round;
 }
 </style>
-<div id="custom-sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+<div id="custom-sidebar-toggle" title="Toggle Sidebar">
   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <path d="M3 6h18M3 12h18M3 18h18" stroke="#262421" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <line x1="3" y1="12" x2="21" y2="12"/>
+    <line x1="3" y1="18" x2="21" y2="18"/>
   </svg>
 </div>
 <script>
-function toggleSidebar() {
-    // Try multiple selectors across Streamlit versions
-    var btn = document.querySelector('[data-testid="collapsedControl"] button')
-           || document.querySelector('[data-testid="stSidebarCollapsedControl"] button')
-           || document.querySelector('[data-testid="stSidebarCollapseButton"]')
-           || document.querySelector('button[title="Collapse sidebar"]')
-           || document.querySelector('button[title="Expand sidebar"]')
-           || document.querySelector('[data-testid="stSidebarCollapseControl"] button');
-    if (btn) { btn.click(); }
-}
+(function() {
+    function findAndClickSidebarBtn(doc) {
+        var selectors = [
+            'button[title="Collapse sidebar"]',
+            'button[title="Expand sidebar"]',
+            '[data-testid="collapsedControl"] button',
+            '[data-testid="stSidebarCollapsedControl"] button',
+            '[data-testid="stSidebarCollapseButton"]',
+            '[data-testid="stSidebarCollapseControl"] button'
+        ];
+        for (var i = 0; i < selectors.length; i++) {
+            var btn = doc.querySelector(selectors[i]);
+            if (btn) { btn.click(); return true; }
+        }
+        return false;
+    }
+
+    function setupToggle() {
+        var toggle = document.getElementById('custom-sidebar-toggle');
+        if (!toggle) return;
+        toggle.addEventListener('click', function() {
+            // Try current document first
+            if (findAndClickSidebarBtn(document)) return;
+            // Try parent frame (in case we're in an iframe)
+            try {
+                if (window.parent && window.parent.document && findAndClickSidebarBtn(window.parent.document)) return;
+            } catch(e) {}
+            // Try top frame
+            try {
+                if (window.top && window.top.document && findAndClickSidebarBtn(window.top.document)) return;
+            } catch(e) {}
+        });
+    }
+
+    // Run after DOM is ready and also retry after a delay for Streamlit's async render
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupToggle);
+    } else {
+        setupToggle();
+    }
+    setTimeout(setupToggle, 1000);
+    setTimeout(setupToggle, 2000);
+})();
 </script>
 """
 st.markdown(_sidebar_toggle_js, unsafe_allow_html=True)
