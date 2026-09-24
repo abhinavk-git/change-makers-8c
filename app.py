@@ -59,22 +59,27 @@ hide_st_style = """<style>
             footer {visibility: hidden; display: none;}
             .stDeployButton {display:none !important;}
 
-            /* Make header transparent — do NOT hide it; it contains the sidebar toggle */
+            /* Make header transparent — keep it in DOM so toggle button works */
             header[data-testid="stHeader"] {
                 background: transparent !important;
             }
 
-            /* Hide only the toolbar strip inside the header, not the entire header */
-            [data-testid="stToolbar"] {
-                visibility: hidden !important;
+            /* Hide action buttons inside the toolbar, but NOT the whole toolbar
+               (collapsedControl lives inside stToolbar so hiding it kills the button) */
+            [data-testid="stToolbarActions"],
+            [data-testid="stToolbarActionButtonContainer"],
+            [data-testid="stStatusWidget"],
+            [data-testid="baseButton-header"],
+            .stMainMenu {
+                display: none !important;
             }
 
-            /* Style the native sidebar toggle as a gold circle */
+            /* Style and position the native sidebar toggle as a gold circle */
             [data-testid="collapsedControl"],
-            [data-testid="stSidebarCollapsedControl"],
-            button[title="Collapse sidebar"],
-            button[title="Expand sidebar"] {
+            [data-testid="stSidebarCollapsedControl"] {
+                position: fixed !important;
                 top: 60px !important;
+                left: 1rem !important;
                 z-index: 9999999 !important;
                 background-color: #C5A059 !important;
                 border-radius: 50% !important;
@@ -83,24 +88,31 @@ hide_st_style = """<style>
                 box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
                 border: 2px solid rgba(255,255,255,0.15) !important;
                 display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
                 align-items: center !important;
                 justify-content: center !important;
                 transition: background-color 0.2s, transform 0.2s !important;
             }
             [data-testid="collapsedControl"]:hover,
-            [data-testid="stSidebarCollapsedControl"]:hover,
-            button[title="Collapse sidebar"]:hover,
-            button[title="Expand sidebar"]:hover {
+            [data-testid="stSidebarCollapsedControl"]:hover {
                 background-color: #dcb873 !important;
                 transform: scale(1.1) !important;
             }
             [data-testid="collapsedControl"] svg,
-            [data-testid="stSidebarCollapsedControl"] svg,
-            button[title="Collapse sidebar"] svg,
-            button[title="Expand sidebar"] svg {
+            [data-testid="stSidebarCollapsedControl"] svg {
                 color: #262421 !important;
                 fill: #262421 !important;
                 stroke: #262421 !important;
+            }
+            /* Also style the collapse button INSIDE the open sidebar */
+            [data-testid="stSidebarCollapseButton"],
+            button[title="Collapse sidebar"],
+            button[title="Expand sidebar"] {
+                background-color: #C5A059 !important;
+                border-radius: 50% !important;
+                visibility: visible !important;
+                opacity: 1 !important;
             }
             
             /* Lichess style Top Navbar background */
