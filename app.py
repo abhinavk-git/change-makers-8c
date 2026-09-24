@@ -54,13 +54,29 @@ st.markdown(bg_css, unsafe_allow_html=True)
 
 hide_st_style = """<style>
 
-            /* Hide Streamlit chrome — but NOT the sidebar toggle button */
+            /* Hide Streamlit chrome — preserve the sidebar toggle */
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden; display: none;}
             .stDeployButton {display:none !important;}
-            [data-testid="stToolbar"] {visibility: hidden !important;}
-            /* Fully hide the Streamlit header bar */
-            header[data-testid="stHeader"] {visibility: hidden !important; height: 0 !important;}
+
+            /* Make header transparent — do NOT hide it; it contains the sidebar toggle */
+            header[data-testid="stHeader"] {
+                background: transparent !important;
+            }
+
+            /* Hide only the toolbar strip inside the header, not the entire header */
+            [data-testid="stToolbar"] {
+                visibility: hidden !important;
+            }
+
+            /* Push the native sidebar toggle button below our custom navbar bar */
+            [data-testid="collapsedControl"],
+            [data-testid="stSidebarCollapsedControl"],
+            button[title="Collapse sidebar"],
+            button[title="Expand sidebar"] {
+                top: 60px !important;
+                z-index: 9999999 !important;
+            }
             
             /* Lichess style Top Navbar background */
             .block-container::before {
@@ -260,93 +276,7 @@ if not st.session_state.logged_in:
 
 
 
-# --- CUSTOM SIDEBAR TOGGLE BUTTON (JS-injected, always visible) ---
-_sidebar_toggle_js = """
-<style>
-#custom-sidebar-toggle {
-    position: fixed;
-    top: 65px;
-    left: 15px;
-    z-index: 9999999;
-    width: 40px;
-    height: 40px;
-    background-color: #C5A059;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    border: 2px solid rgba(255,255,255,0.15);
-    transition: background-color 0.2s, transform 0.2s;
-}
-#custom-sidebar-toggle:hover {
-    background-color: #dcb873;
-    transform: scale(1.1);
-}
-#custom-sidebar-toggle svg {
-    width: 20px;
-    height: 20px;
-    fill: none;
-    stroke: #262421;
-    stroke-width: 2.5;
-    stroke-linecap: round;
-}
-</style>
-<div id="custom-sidebar-toggle" title="Toggle Sidebar">
-  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <line x1="3" y1="6" x2="21" y2="6"/>
-    <line x1="3" y1="12" x2="21" y2="12"/>
-    <line x1="3" y1="18" x2="21" y2="18"/>
-  </svg>
-</div>
-<script>
-(function() {
-    function findAndClickSidebarBtn(doc) {
-        var selectors = [
-            'button[title="Collapse sidebar"]',
-            'button[title="Expand sidebar"]',
-            '[data-testid="collapsedControl"] button',
-            '[data-testid="stSidebarCollapsedControl"] button',
-            '[data-testid="stSidebarCollapseButton"]',
-            '[data-testid="stSidebarCollapseControl"] button'
-        ];
-        for (var i = 0; i < selectors.length; i++) {
-            var btn = doc.querySelector(selectors[i]);
-            if (btn) { btn.click(); return true; }
-        }
-        return false;
-    }
 
-    function setupToggle() {
-        var toggle = document.getElementById('custom-sidebar-toggle');
-        if (!toggle) return;
-        toggle.addEventListener('click', function() {
-            // Try current document first
-            if (findAndClickSidebarBtn(document)) return;
-            // Try parent frame (in case we're in an iframe)
-            try {
-                if (window.parent && window.parent.document && findAndClickSidebarBtn(window.parent.document)) return;
-            } catch(e) {}
-            // Try top frame
-            try {
-                if (window.top && window.top.document && findAndClickSidebarBtn(window.top.document)) return;
-            } catch(e) {}
-        });
-    }
-
-    // Run after DOM is ready and also retry after a delay for Streamlit's async render
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupToggle);
-    } else {
-        setupToggle();
-    }
-    setTimeout(setupToggle, 1000);
-    setTimeout(setupToggle, 2000);
-})();
-</script>
-"""
-st.markdown(_sidebar_toggle_js, unsafe_allow_html=True)
 # --- SIDEBAR NAVIGATION ---
 if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
