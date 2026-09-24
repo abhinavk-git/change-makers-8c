@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import database as db
 import datetime
 from streamlit_option_menu import option_menu
@@ -274,6 +275,75 @@ if not st.session_state.logged_in:
 
 
 
+
+# --- SIDEBAR TOGGLE BUTTON ---
+# st.markdown injects button HTML into the parent page DOM (CSS works, scripts don't execute)
+st.markdown("""
+<style>
+#sidebar-toggle-btn {
+    position: fixed;
+    top: 60px;
+    left: 15px;
+    z-index: 9999999;
+    width: 40px;
+    height: 40px;
+    background-color: #C5A059;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    border: none;
+    transition: background-color 0.2s, transform 0.2s;
+}
+#sidebar-toggle-btn:hover { background-color: #dcb873; transform: scale(1.05); }
+</style>
+<div id="sidebar-toggle-btn" title="Toggle Sidebar">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+       stroke="#262421" stroke-width="2.5" stroke-linecap="round">
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <line x1="3" y1="12" x2="21" y2="12"/>
+    <line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+</div>
+""", unsafe_allow_html=True)
+
+# components.html ACTUALLY executes JS inside a real iframe with window.parent access
+components.html("""
+<script>
+(function() {
+  function clickSidebarToggle() {
+    var p = window.parent;
+    var selectors = [
+      'button[title="Collapse sidebar"]',
+      'button[title="Expand sidebar"]',
+      '[data-testid="collapsedControl"] button',
+      '[data-testid="stSidebarCollapsedControl"] button',
+      '[data-testid="stSidebarCollapseButton"]',
+      '[data-testid="stSidebarCollapseControl"] button'
+    ];
+    for (var i = 0; i < selectors.length; i++) {
+      var btn = p.document.querySelector(selectors[i]);
+      if (btn) { btn.click(); return; }
+    }
+  }
+
+  function attachToggle() {
+    var btn = window.parent.document.getElementById('sidebar-toggle-btn');
+    if (btn && !btn.__attached) {
+      btn.__attached = true;
+      btn.addEventListener('click', clickSidebarToggle);
+    }
+  }
+
+  attachToggle();
+  setTimeout(attachToggle, 300);
+  setTimeout(attachToggle, 800);
+  setTimeout(attachToggle, 2000);
+})();
+</script>
+""", height=0)
 
 # --- SIDEBAR NAVIGATION ---
 if "page" not in st.session_state:
