@@ -152,6 +152,8 @@ hide_st_style = """<style>
             }
             """
 
+# Inject CSS immediately — before sidebar or any widget renders
+st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
 
@@ -278,7 +280,6 @@ if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
 
 with st.sidebar:
-    st.markdown(hide_st_style, unsafe_allow_html=True)
     st.title("Museum Menu")
     if st.button("Dashboard", use_container_width=True):
         st.session_state.page = "Dashboard"
