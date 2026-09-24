@@ -54,96 +54,35 @@ st.markdown(bg_css, unsafe_allow_html=True)
 
 hide_st_style = """<style>
 
-            /* Hide Streamlit chrome — preserve the sidebar toggle */
-            #MainMenu {visibility: hidden;}
+            /* Hide Streamlit footer/deploy badge only — touch nothing else */
             footer {visibility: hidden; display: none;}
             .stDeployButton {display:none !important;}
+            [data-testid="stToolbarActions"] {display:none !important;}
 
-            /* Make header transparent — keep it in DOM so toggle button works */
+            /* Keep header transparent so the native sidebar toggle is visible */
             header[data-testid="stHeader"] {
                 background: transparent !important;
             }
 
-            /* Hide action buttons inside the toolbar, but NOT the whole toolbar
-               (collapsedControl lives inside stToolbar so hiding it kills the button) */
-            [data-testid="stToolbarActions"],
-            [data-testid="stToolbarActionButtonContainer"],
-            [data-testid="stStatusWidget"],
-            [data-testid="baseButton-header"],
-            .stMainMenu {
-                display: none !important;
-            }
-
-            /* Style and position the native sidebar toggle as a gold circle */
-            [data-testid="collapsedControl"],
-            [data-testid="stSidebarCollapsedControl"] {
-                position: fixed !important;
-                top: 60px !important;
-                left: 1rem !important;
-                z-index: 9999999 !important;
-                background-color: #C5A059 !important;
-                border-radius: 50% !important;
-                width: 40px !important;
-                height: 40px !important;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
-                border: 2px solid rgba(255,255,255,0.15) !important;
-                display: flex !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-                align-items: center !important;
-                justify-content: center !important;
-                transition: background-color 0.2s, transform 0.2s !important;
-            }
-            [data-testid="collapsedControl"]:hover,
-            [data-testid="stSidebarCollapsedControl"]:hover {
-                background-color: #dcb873 !important;
-                transform: scale(1.1) !important;
-            }
-            [data-testid="collapsedControl"] svg,
-            [data-testid="stSidebarCollapsedControl"] svg {
-                color: #262421 !important;
-                fill: #262421 !important;
-                stroke: #262421 !important;
-            }
-            /* Also style the collapse button INSIDE the open sidebar */
-            [data-testid="stSidebarCollapseButton"],
-            button[title="Collapse sidebar"],
-            button[title="Expand sidebar"] {
-                background-color: #C5A059 !important;
-                border-radius: 50% !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-            }
-            
-            /* Lichess style Top Navbar background */
+            /* Lichess-style top navbar bar */
             .block-container::before {
-                content: '';
+                content: \'\';
                 position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
+                top: 0; left: 0; right: 0;
                 height: 50px;
                 background-color: rgba(38, 36, 33, 0.75);
                 backdrop-filter: blur(15px);
                 border-bottom: 2px solid #C5A059;
                 z-index: 999998;
             }
-            
 
-            /* Pin the COLUMN containing the notification bell to top-right.
-               Fixing the column (not just the button) means Streamlit's popup JS
-               reads the correct getBoundingClientRect() and opens the menu from the
-               top-right corner, not from the original DOM center position. */
+            /* Notification bell pinned top-right */
             div[data-testid="column"]:has(div[data-testid="stPopover"]) {
                 position: fixed !important;
-                top: 8px !important;
-                right: 20px !important;
+                top: 8px !important; right: 20px !important;
                 z-index: 999999 !important;
-                width: auto !important;
-                padding: 0 !important;
+                width: auto !important; padding: 0 !important;
             }
-            
-            /* Style the bell button */
             div[data-testid="column"]:has(div[data-testid="stPopover"]) button {
                 background-color: transparent !important;
                 border: none !important;
@@ -157,8 +96,8 @@ hide_st_style = """<style>
                 color: white !important;
                 background-color: #363431 !important;
             }
-            
-            /* Blur for Forms */
+
+            /* Forms blur effect */
             div[data-testid="stForm"] {
                 background-color: rgba(38, 36, 33, 0.75) !important;
                 backdrop-filter: blur(15px) !important;
@@ -166,7 +105,7 @@ hide_st_style = """<style>
                 border: 1px solid rgba(197, 160, 89, 0.3) !important;
             }
 
-            /* Push main content down so it doesn't hide behind the navbar */
+            /* Main content padding */
             .block-container {
                 padding-top: 70px !important;
                 max-width: none !important;
@@ -174,25 +113,45 @@ hide_st_style = """<style>
                 padding-right: 5% !important;
                 background-color: transparent !important;
             }
-            
-            /* Make sidebar transparent glass and sit above the top navbar */
+
+            /* Sidebar glass effect */
             [data-testid="stSidebar"] {
                 background-color: rgba(38, 36, 33, 0.7) !important;
                 backdrop-filter: blur(15px) !important;
                 z-index: 1000000 !important;
             }
-            
-            /* Move the expand button down so it's not covered by the top navbar blur */
+
+            /* Gold styling for sidebar collapse/expand toggle */
             [data-testid="collapsedControl"],
             [data-testid="stSidebarCollapsedControl"],
             [data-testid="stSidebarCollapseButton"],
-            [data-testid="stSidebarCollapseControl"] {
-                position: fixed !important;
-                top: 65px !important;
-                left: 15px !important;
-                z-index: 1000000 !important;
+            button[title="Collapse sidebar"],
+            button[title="Expand sidebar"] {
+                background-color: #C5A059 !important;
+                border-radius: 50% !important;
+                width: 2.5rem !important;
+                height: 2.5rem !important;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+            [data-testid="collapsedControl"]:hover,
+            [data-testid="stSidebarCollapsedControl"]:hover,
+            [data-testid="stSidebarCollapseButton"]:hover,
+            button[title="Collapse sidebar"]:hover,
+            button[title="Expand sidebar"]:hover {
+                background-color: #dcb873 !important;
+            }
+            [data-testid="collapsedControl"] svg,
+            [data-testid="stSidebarCollapsedControl"] svg,
+            [data-testid="stSidebarCollapseButton"] svg,
+            button[title="Collapse sidebar"] svg,
+            button[title="Expand sidebar"] svg {
+                color: #262421 !important;
+                fill: #262421 !important;
             }
             """
+
 
 
 
