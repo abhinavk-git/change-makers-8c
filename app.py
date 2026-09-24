@@ -59,62 +59,8 @@ hide_st_style = """<style>
             footer {visibility: hidden; display: none;}
             .stDeployButton {display:none !important;}
             [data-testid="stToolbar"] {visibility: hidden !important;}
-            /* Hide the header but keep the sidebar collapse button visible */
-            /* We do this by hiding only the parts of the header we don't want */
-            header[data-testid="stHeader"] > * {visibility: hidden !important;}
-            /* But show the collapse/expand button that lives inside the header */
-            header[data-testid="stHeader"] [data-testid="collapsedControl"],
-            header[data-testid="stHeader"] [data-testid="stSidebarCollapsedControl"],
-            header[data-testid="stHeader"] button[title="Collapse sidebar"],
-            header[data-testid="stHeader"] button[title="Expand sidebar"],
-            [data-testid="collapsedControl"],
-            [data-testid="stSidebarCollapsedControl"],
-            [data-testid="stSidebarCollapseButton"],
-            [data-testid="stSidebarCollapseControl"],
-            button[title="Collapse sidebar"],
-            button[title="Expand sidebar"] {
-                display: flex !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-                background-color: #C5A059 !important;
-                border-radius: 50% !important;
-                width: 40px !important;
-                height: 40px !important;
-                align-items: center !important;
-                justify-content: center !important;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
-                border: 2px solid rgba(255, 255, 255, 0.1) !important;
-                position: fixed !important;
-                top: 65px !important;
-                left: 15px !important;
-                z-index: 9999999 !important;
-                pointer-events: auto !important;
-            }
-
-            /* Arrow SVG color */
-            [data-testid="collapsedControl"] svg,
-            [data-testid="stSidebarCollapsedControl"] svg,
-            [data-testid="stSidebarCollapseButton"] svg,
-            [data-testid="stSidebarCollapseControl"] svg,
-            button[title="Collapse sidebar"] svg,
-            button[title="Expand sidebar"] svg {
-                color: #262421 !important;
-                fill: #262421 !important;
-                stroke: #262421 !important;
-                width: 24px !important;
-                height: 24px !important;
-                visibility: visible !important;
-                display: block !important;
-            }
-
-            [data-testid="collapsedControl"]:hover,
-            [data-testid="stSidebarCollapsedControl"]:hover,
-            [data-testid="stSidebarCollapseButton"]:hover,
-            [data-testid="stSidebarCollapseControl"]:hover {
-                background-color: #dcb873 !important;
-                transform: scale(1.1) !important;
-                transition: all 0.2s ease-in-out !important;
-            }
+            /* Fully hide the Streamlit header bar */
+            header[data-testid="stHeader"] {visibility: hidden !important; height: 0 !important;}
             
             /* Lichess style Top Navbar background */
             .block-container::before {
@@ -312,6 +258,57 @@ if not st.session_state.logged_in:
     else:
         st.rerun()
 
+
+
+# --- CUSTOM SIDEBAR TOGGLE BUTTON (JS-injected, always visible) ---
+_sidebar_toggle_js = """
+<style>
+#custom-sidebar-toggle {
+    position: fixed;
+    top: 65px;
+    left: 15px;
+    z-index: 9999999;
+    width: 40px;
+    height: 40px;
+    background-color: #C5A059;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    border: 2px solid rgba(255,255,255,0.15);
+    transition: background-color 0.2s, transform 0.2s;
+}
+#custom-sidebar-toggle:hover {
+    background-color: #dcb873;
+    transform: scale(1.1);
+}
+#custom-sidebar-toggle svg {
+    width: 20px;
+    height: 20px;
+    fill: #262421;
+}
+</style>
+<div id="custom-sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3 6h18M3 12h18M3 18h18" stroke="#262421" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  </svg>
+</div>
+<script>
+function toggleSidebar() {
+    // Try multiple selectors across Streamlit versions
+    var btn = document.querySelector('[data-testid="collapsedControl"] button')
+           || document.querySelector('[data-testid="stSidebarCollapsedControl"] button')
+           || document.querySelector('[data-testid="stSidebarCollapseButton"]')
+           || document.querySelector('button[title="Collapse sidebar"]')
+           || document.querySelector('button[title="Expand sidebar"]')
+           || document.querySelector('[data-testid="stSidebarCollapseControl"] button');
+    if (btn) { btn.click(); }
+}
+</script>
+"""
+st.markdown(_sidebar_toggle_js, unsafe_allow_html=True)
 # --- SIDEBAR NAVIGATION ---
 if "page" not in st.session_state:
     st.session_state.page = "Dashboard"
